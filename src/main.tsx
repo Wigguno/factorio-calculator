@@ -14,7 +14,7 @@ const BASE_CSS = String.raw`
 * { box-sizing: border-box; }
 html, body, #root { min-height: 100%; margin: 0; }
 html { color-scheme: dark; scrollbar-gutter: stable; }
-body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; line-height: 1.42; color: #c8c8c8; background: #171717; font-variant-numeric: tabular-nums; }
+body { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif; font-size: 14px; line-height: 1.45; color: #e8e4dc; background: #1b1b1b; font-variant-numeric: tabular-nums; }
 button, input, select { font: inherit; }
 button:not(:disabled):hover { border-color: var(--accent) !important; }
 button:disabled { cursor: not-allowed !important; opacity: 0.5; }
@@ -32,19 +32,19 @@ summary { list-style-position: outside; }
 .density-switch label { position: relative; display: inline-block; }
 .density-switch input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .density-switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-.density-switch input:checked + span { color: var(--bright); border-bottom-color: var(--accent); }
+.density-switch input:checked + span { color: var(--on-accent); background: var(--accent); font-weight: 600; }
 .icon-choice:hover > span { background: var(--bright) !important; }
 .icon-choice > input:checked + span { background: var(--accent) !important; }
 .icon-choice > input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .factory-table tbody tr:hover > td { background: rgba(255,255,255,0.025); }
-.factory-table .target-output-row > td:first-child { border-left: 2px solid var(--accent); }
+.factory-table .target-output-row > td:first-child { border-left: 3px solid var(--accent); }
 .factory-table td, .factory-table th { white-space: nowrap; }
 .factory-table .item-name { white-space: nowrap; }
 .factory-table .belt-controls { flex-wrap: nowrap !important; }
 [data-density="compact"] .factory-table td.factory-modules,
 [data-density="compact"] .factory-table td.factory-beacons { padding-top: 4.65px !important; padding-bottom: 4.65px !important; }
 .compact-icon-select select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-.icon-picker > button:hover, .icon-picker[data-open="true"] > button { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 3px; }
+.icon-picker > button:hover, .icon-picker[data-open="true"] > button { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 8px; }
 .help-table th, .help-table td { border-bottom: 1px solid var(--rule); }
 .help-table tbody tr:last-child td { border-bottom: 0; }
 .graph-measurement { position: absolute; visibility: hidden; pointer-events: none; }
@@ -87,7 +87,7 @@ summary { list-style-position: outside; }
   .factory-summary-card { width: auto; }
   .factory-table .factory-surplus { display: none; }
   .factory-table th:first-child, .factory-table td:first-child,
-  .factory-table th:nth-child(2), .factory-table td:nth-child(2) { position: sticky; z-index: 2; background: var(--dark); }
+  .factory-table th:nth-child(2), .factory-table td:nth-child(2) { position: sticky; z-index: 2; background: var(--card); }
   .factory-table th:first-child, .factory-table td:first-child { left: 0; }
   .factory-table th:nth-child(2), .factory-table td:nth-child(2) { left: 25px; }
   .factory-table { font-size: 13px !important; }
@@ -10275,18 +10275,32 @@ export function bindCalculatorSpecification(specification: FactorySpecification)
 // endregion application/store.ts
 
 // region theme.ts
+// Design tokens from the mockup canvas: a warm dark ground, one amber accent,
+// mono numerals. Legacy names below alias onto them until every usage moves.
 const THEME_VARIABLES = {
-  "--dark": "#171717",
-  "--dark-overlay": "rgba(23, 23, 23, 0.8)",
-  "--medium": "#212427",
-  "--main": "#272b30",
-  "--light": "#3a3f44",
-  "--rule": "#454b51",
-  "--foreground": "#c8c8c8",
-  "--muted": "#a7adb3",
-  "--accent": "#ff7200",
-  "--bright": "#f1fff2",
-  "--danger": "#f1a36c",
+  "--bg": "#1b1b1b",
+  "--surface": "#202020",
+  "--card": "#262626",
+  "--border": "#3a3a3a",
+  "--divider": "#333333",
+  "--text": "#e8e4dc",
+  "--text-soft": "#d7d2c8",
+  "--muted": "#a8a399",
+  "--accent": "#e8a04a",
+  "--accent-soft": "#2e2a22",
+  "--on-accent": "#1b1b1b",
+  "--danger": "#e07b6a",
+  "--overlay": "rgba(27, 27, 27, 0.85)",
+  "--font-sans": '"IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif',
+  "--font-mono": '"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace',
+  "--dark": "var(--bg)",
+  "--dark-overlay": "var(--overlay)",
+  "--medium": "var(--card)",
+  "--main": "var(--surface)",
+  "--light": "var(--border)",
+  "--rule": "var(--divider)",
+  "--foreground": "var(--text)",
+  "--bright": "#f4f1ea",
 } as CSSProperties
 // endregion theme.ts
 
@@ -12171,16 +12185,18 @@ const UI = {
   app: {
     minHeight: "100vh",
     padding: "0.75rem 1rem 2rem",
-    color: "var(--foreground)",
-    background: "var(--dark)",
+    color: "var(--text)",
+    background: "var(--bg)",
+    fontFamily: "var(--font-sans)",
   },
   page: { width: "min(1680px, 100%)", margin: "0 auto" },
   muted: { color: "var(--muted)", fontSize: 12 },
+  number: { fontFamily: "var(--font-mono)", fontWeight: 500 },
   panel: {
     marginBottom: 10,
     padding: "0.65rem 0",
-    borderTop: "1px solid var(--rule)",
-    borderBottom: "1px solid var(--rule)",
+    borderTop: "1px solid var(--divider)",
+    borderBottom: "1px solid var(--divider)",
     background: "transparent",
   },
   panelHeader: {
@@ -12202,73 +12218,79 @@ const UI = {
     maxWidth: "100%",
   },
   field: { display: "grid", gap: 3, minWidth: 0 },
-  label: { color: "var(--muted)", fontSize: 12, fontWeight: 600 },
+  label: {
+    color: "var(--muted)",
+    fontSize: 11,
+    fontWeight: 500,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+  },
   control: {
     width: "100%",
-    minHeight: 30,
-    padding: "4px 7px",
-    color: "var(--foreground)",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "var(--medium)",
+    minHeight: 36,
+    padding: "6px 10px",
+    color: "var(--text)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    background: "var(--card)",
   },
   button: {
-    minHeight: 32,
-    padding: "4px 10px",
-    color: "var(--foreground)",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "var(--medium)",
+    minHeight: 36,
+    padding: "6px 12px",
+    color: "var(--text)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    background: "var(--card)",
+    fontWeight: 500,
     cursor: "pointer",
   },
   primaryButton: {
-    minHeight: 32,
-    padding: "4px 10px",
-    color: "var(--foreground)",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "var(--medium)",
+    minHeight: 36,
+    padding: "6px 14px",
+    color: "var(--on-accent)",
+    border: "1px solid var(--accent)",
+    borderRadius: 10,
+    background: "var(--accent)",
+    fontWeight: 600,
     cursor: "pointer",
   },
   dangerButton: {
-    width: 28,
-    minHeight: 32,
+    width: 32,
+    minHeight: 36,
     padding: 0,
-    color: "var(--foreground)",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "var(--medium)",
+    color: "var(--danger)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    background: "var(--card)",
     cursor: "pointer",
   },
   tabs: {
     display: "flex",
     flexWrap: "wrap",
-    alignItems: "flex-end",
-    gap: 20,
-    marginTop: 10.4,
-    marginBottom: 10,
-    borderBottom: "1px solid var(--rule)",
+    alignItems: "center",
+    gap: 4,
+    margin: "10px 0",
+    padding: "8px 0",
+    borderBottom: "1px solid var(--divider)",
     position: "sticky",
     top: 0,
     zIndex: 8,
-    background: "var(--dark-overlay)",
+    background: "var(--overlay)",
     backdropFilter: "blur(6px)",
   },
   tab: {
-    padding: "8.8px 0 7.2px",
+    minHeight: 40,
+    padding: "8px 14px",
     color: "var(--muted)",
     border: 0,
-    borderBottomWidth: 2,
-    borderBottomStyle: "solid",
-    borderBottomColor: "transparent",
+    borderRadius: 10,
     background: "transparent",
-    fontWeight: 600,
+    fontWeight: 500,
     cursor: "pointer",
   },
   activeTab: {
-    color: "var(--bright)",
-    borderBottomColor: "var(--accent)",
-    background: "transparent",
+    color: "var(--accent)",
+    background: "var(--accent-soft)",
   },
   summary: {
     display: "grid",
@@ -12282,25 +12304,33 @@ const UI = {
     background: "transparent",
   },
   summaryValue: {
-    color: "var(--bright)",
-    fontFamily: "monospace",
-    fontSize: 16,
-    fontWeight: 650,
+    color: "var(--text)",
+    fontFamily: "var(--font-mono)",
+    fontSize: 20,
+    fontWeight: 500,
   },
-  tableWrap: { width: "100%", overflowX: "auto" },
+  tableWrap: {
+    width: "100%",
+    overflowX: "auto",
+    border: "1px solid var(--border)",
+    borderRadius: 12,
+    background: "var(--card)",
+  },
   table: { width: "100%", borderCollapse: "collapse", fontSize: 14 },
   th: {
     padding: "var(--cell-padding)",
     color: "var(--muted)",
-    borderBottom: "1px solid var(--rule)",
-    fontSize: 12,
-    fontWeight: 600,
+    borderBottom: "1px solid var(--divider)",
+    fontSize: 11,
+    fontWeight: 500,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
     textAlign: "left",
     whiteSpace: "nowrap",
   },
   td: {
     padding: "var(--cell-padding)",
-    borderBottom: "1px solid #30353a",
+    borderBottom: "1px solid var(--divider)",
     verticalAlign: "middle",
   },
   iconLabel: {
@@ -12312,39 +12342,40 @@ const UI = {
   details: {
     padding: "7px 0",
     border: 0,
-    borderBottom: "1px solid var(--rule)",
+    borderBottom: "1px solid var(--divider)",
     borderRadius: 0,
     background: "transparent",
   },
   detailsSummary: {
-    color: "var(--bright)",
-    fontWeight: 700,
+    color: "var(--text)",
+    fontWeight: 600,
     cursor: "pointer",
   },
   callout: {
-    padding: "9px 11px",
+    padding: "10px 14px",
     borderLeft: "3px solid var(--accent)",
-    borderRadius: 2,
-    background: "var(--medium)",
+    borderRadius: 12,
+    background: "var(--card)",
   },
   error: {
     marginBottom: 12,
     padding: 12,
-    color: "var(--bright)",
-    border: "1px solid var(--rule)",
+    color: "var(--text)",
+    border: "1px solid var(--border)",
     borderLeftWidth: 4,
     borderLeftColor: "var(--danger)",
-    borderRadius: 2,
-    background: "transparent",
+    borderRadius: 12,
+    background: "var(--card)",
   },
   chip: {
     display: "inline-flex",
     alignItems: "center",
     gap: 5,
-    padding: "2px 5px",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "var(--medium)",
+    padding: "3px 9px",
+    border: "1px solid var(--border)",
+    borderRadius: 999,
+    background: "var(--bg)",
+    fontSize: 13,
   },
   twoColumns: {
     display: "grid",
@@ -12356,9 +12387,9 @@ const UI = {
     display: "grid",
     gap: "var(--layout-gap)",
     padding: "var(--panel-padding)",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "transparent",
+    border: "1px solid var(--border)",
+    borderRadius: 12,
+    background: "var(--card)",
   },
   moduleGrid: {
     display: "grid",
@@ -12382,8 +12413,8 @@ const UI = {
     height: 36,
     padding: 2,
     border: "1px solid var(--accent)",
-    borderRadius: 6,
-    background: "var(--medium)",
+    borderRadius: 10,
+    background: "var(--card)",
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.65)",
     opacity: 0.88,
     pointerEvents: "none",
@@ -12392,15 +12423,16 @@ const UI = {
     width: "100%",
     minHeight: 500,
     overflow: "auto",
-    border: "1px solid var(--rule)",
-    borderRadius: 3,
-    background: "var(--main)",
+    border: "1px solid var(--border)",
+    borderRadius: 12,
+    background: "var(--surface)",
   },
   help: { maxWidth: 900, lineHeight: 1.55 },
   footer: {
     marginTop: 36,
     paddingTop: 12,
-    borderTop: "1px solid var(--rule)",
+    borderTop: "1px solid var(--divider)",
+    color: "var(--muted)",
     fontSize: 12,
   },
 } satisfies StyleMap
@@ -12554,7 +12586,7 @@ function CompactIconSelect({
           width: 36,
           height: 36,
           border: "1px solid var(--rule)",
-          borderRadius: 2,
+          borderRadius: 8,
           background: "transparent",
         }}
       >
@@ -12627,7 +12659,7 @@ function IconChoice({
           width: 36,
           height: 36,
           border: "1px solid var(--foreground)",
-          borderRadius: 2,
+          borderRadius: 8,
           background: checked ? "var(--accent)" : "var(--light)",
         }}
       >
@@ -12767,7 +12799,7 @@ function LocationSelector({ specification }: { readonly specification: FactorySp
                 selected && {
                   borderColor: "var(--accent)",
                   color: "var(--bright)",
-                  background: "rgba(233, 121, 36, 0.09)",
+                  background: "var(--accent-soft)",
                 },
               )}
               onClick={(event) => {
@@ -12908,7 +12940,7 @@ function TargetItemPicker({
             padding: 5,
             border: "1px solid var(--light)",
             borderTop: "2px solid var(--accent)",
-            borderRadius: 2,
+            borderRadius: 8,
             background: "var(--dark)",
             boxShadow: "0 10px 24px rgba(0, 0, 0, 0.62)",
           }}
@@ -12963,7 +12995,7 @@ function TargetItemPicker({
                             height: 32,
                             padding: 0,
                             border: `1px solid ${selected ? "var(--accent)" : "transparent"}`,
-                            borderRadius: 2,
+                            borderRadius: 8,
                             background: selected ? "var(--light)" : "transparent",
                             cursor: "pointer",
                           }}
@@ -13081,7 +13113,7 @@ function TargetRow({ target, snapshot }: { readonly target: BuildTarget; readonl
             <span
               style={{
                 ...UI.muted,
-                fontFamily: "monospace",
+                fontFamily: "var(--font-mono)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -13142,7 +13174,7 @@ function TargetsPanel({ snapshot, commands }: CalculatorViewProps) {
       </ul>
       <button
         type="button"
-        style={{ ...UI.button, width: 103, margin: "2.3px 0 6.4px 40px" }}
+        style={{ ...UI.button, width: "max-content", whiteSpace: "nowrap", margin: "2.3px 0 6.4px 40px" }}
         disabled={snapshot.status === "loading"}
         onClick={() => commands.addTarget()}
       >
@@ -13238,15 +13270,16 @@ function TabBar({ snapshot, commands }: CalculatorViewProps) {
           aria-label="Factory row density"
           style={{
             ...UI.row,
-            gap: 0,
+            gap: 3,
             margin: "0 0 0 auto",
-            padding: 0,
+            padding: 3,
             border: 0,
-            fontSize: 11,
+            borderRadius: 10,
+            background: "var(--bg)",
+            fontSize: 12,
           }}
         >
           <legend style={UI.visuallyHidden}>Factory row density</legend>
-          <span style={{ ...UI.muted, marginRight: 5 }}>Rows</span>
           {(
             [
               ["comfortable", "Relaxed"],
@@ -13264,8 +13297,9 @@ function TabBar({ snapshot, commands }: CalculatorViewProps) {
               <span
                 style={{
                   display: "inline-block",
-                  padding: "3.2px 6px",
-                  borderBottom: "1px solid transparent",
+                  padding: "5px 10px",
+                  borderRadius: 8,
+                  color: "var(--text)",
                 }}
               >
                 {label}
@@ -13475,7 +13509,7 @@ function RecipeIconPicker({
             color: "var(--foreground)",
             border: "1px solid var(--rule)",
             borderTop: "2px solid var(--accent)",
-            borderRadius: 2,
+            borderRadius: 8,
             background: "var(--dark)",
             boxShadow: "0 10px 24px rgba(0, 0, 0, 0.55)",
           }}
@@ -13531,7 +13565,7 @@ function RecipeIconPicker({
                         alignItems: "center",
                         gap: 6,
                         padding: "3px 4px",
-                        borderRadius: 4,
+                        borderRadius: 8,
                         color: recipe === activeRecipe ? "var(--bright)" : undefined,
                         cursor: "pointer",
                         whiteSpace: "nowrap",
@@ -13686,7 +13720,7 @@ function ItemBreakdown({
                 padding: "2px 6px",
                 borderTop: row.divider ? "1px solid var(--rule)" : undefined,
                 textAlign: "right",
-                fontFamily: "monospace",
+                fontFamily: "var(--font-mono)",
               }}
             >
               <span style={{ display: "inline-block", lineHeight: 1.42 }}>{specification.format.rate(row.rate)}</span>
@@ -13709,7 +13743,7 @@ function ItemBreakdown({
                   }}
                 >
                   <SpriteIcon icon={belt.icon} size={32} title={belt.name} /> ×
-                  <span style={{ fontFamily: "monospace" }}>
+                  <span style={{ fontFamily: "var(--font-mono)" }}>
                     {specification.format.count(specification.getBeltCount(row.item, row.rate))}
                   </span>
                 </span>
@@ -13735,7 +13769,7 @@ function ItemBreakdown({
                   }}
                 >
                   <SpriteIcon icon={row.building.icon} size={32} title={row.building.name} /> ×
-                  <span style={{ fontFamily: "monospace" }}>{specification.format.count(row.count)}</span>
+                  <span style={{ fontFamily: "var(--font-mono)" }}>{specification.format.count(row.count)}</span>
                 </span>
               )}
             </td>
@@ -13746,7 +13780,7 @@ function ItemBreakdown({
                 padding: "2px 0",
                 borderTop: row.divider ? "1px solid var(--rule)" : undefined,
                 textAlign: "right",
-                fontFamily: "monospace",
+                fontFamily: "var(--font-mono)",
               }}
             >
               <span style={{ display: "inline-block", lineHeight: 1.42 }}>{row.percent}</span>
@@ -13992,7 +14026,7 @@ function ItemTable({
                     style={{
                       ...UI.td,
                       textAlign: "right",
-                      fontFamily: "monospace",
+                      fontFamily: "var(--font-mono)",
                     }}
                   >
                     {item === null ? null : specification.format.rate(rate)}
@@ -14009,7 +14043,7 @@ function ItemTable({
                           justifyContent: "flex-end",
                         }}
                       >
-                        <span style={{ fontFamily: "monospace" }}>{specification.format.count(belts)}</span>
+                        <span style={{ fontFamily: "var(--font-mono)" }}>{specification.format.count(belts)}</span>
                         <select
                           aria-label={`Belt stacking for ${item.name}`}
                           value={
@@ -14039,7 +14073,7 @@ function ItemTable({
                           <option value="stacked">Stacked</option>
                           <option value="unstacked">Unstacked</option>
                         </select>
-                        <span style={{ ...UI.muted, fontFamily: "monospace" }}>
+                        <span style={{ ...UI.muted, fontFamily: "var(--font-mono)" }}>
                           ×{specification.getEffectiveBeltStackSize(item, recipe).toDecimal()}
                         </span>
                       </div>
@@ -14169,7 +14203,7 @@ function ItemTable({
                     style={{
                       ...UI.td,
                       textAlign: "right",
-                      fontFamily: "monospace",
+                      fontFamily: "var(--font-mono)",
                     }}
                   >
                     {power === null || power.fuel === null
@@ -14387,7 +14421,7 @@ function InlineEquipmentPopover({
             textAlign: "left",
             border: "1px solid var(--light)",
             borderTop: "2px solid var(--accent)",
-            borderRadius: 2,
+            borderRadius: 8,
             background: "var(--dark)",
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.72)",
           }}
@@ -14439,7 +14473,7 @@ function EquipmentQualityStrip({
               height: 32,
               padding: 2,
               border: `1px solid ${chosen ? "var(--accent)" : "var(--light)"}`,
-              borderRadius: 3,
+              borderRadius: 8,
               background: chosen ? "var(--light)" : "var(--medium)",
               cursor: "pointer",
             }}
@@ -14532,7 +14566,7 @@ function InlineMachinePicker({
             height: 36,
             padding: 2,
             border: `1px solid ${open ? "var(--accent)" : "var(--rule)"}`,
-            borderRadius: 2,
+            borderRadius: 8,
             background: "transparent",
             cursor: "pointer",
           }}
@@ -14570,7 +14604,7 @@ function InlineMachinePicker({
                 padding: "2px 6px",
                 color: "var(--foreground)",
                 border: "1px solid transparent",
-                borderRadius: 3,
+                borderRadius: 8,
                 background: chosen ? "var(--light)" : "transparent",
                 textAlign: "left",
                 cursor: "pointer",
@@ -14770,7 +14804,7 @@ function InlineModulePicker({
             padding: 2,
             color: "var(--foreground)",
             border: `1px solid ${open ? "var(--accent)" : "var(--rule)"}`,
-            borderRadius: 2,
+            borderRadius: 8,
             background: "transparent",
             cursor: pipette.selection === null ? "pointer" : "copy",
           }}
@@ -14820,7 +14854,7 @@ function InlineModulePicker({
                     height: 36,
                     padding: 2,
                     border: `1px solid ${chosen ? "var(--accent)" : "var(--light)"}`,
-                    borderRadius: 3,
+                    borderRadius: 8,
                     background: chosen ? "var(--light)" : "var(--medium)",
                     cursor: "pointer",
                   }}
@@ -14889,7 +14923,7 @@ function InlineBeaconQualityPicker({
             height: 26,
             padding: 2,
             border: `1px solid ${open ? "var(--accent)" : "var(--light)"}`,
-            borderRadius: 3,
+            borderRadius: 8,
             background: "var(--medium)",
             cursor: "pointer",
           }}
@@ -15470,7 +15504,7 @@ function FactoryPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
     return (
       <div style={UI.error} role="alert">
         <strong>Unable to calculate this factory.</strong>
-        <div style={{ marginTop: 6, fontFamily: "monospace" }}>
+        <div style={{ marginTop: 6, fontFamily: "var(--font-mono)" }}>
           {snapshot.errorMessage ?? "Unknown calculation error"}
         </div>
         <div style={{ marginTop: 6 }}>Check targets, selected locations, recipes, and quality settings.</div>
@@ -16794,7 +16828,7 @@ function RecipeSettings({ snapshot }: { readonly snapshot: CalculatorSnapshot })
           height: 40,
           padding: 2,
           border: `2px solid ${enabled ? "var(--accent)" : "var(--rule)"}`,
-          borderRadius: 3,
+          borderRadius: 8,
           background: "var(--dark)",
           cursor: unavailable ? "not-allowed" : "pointer",
         }}
@@ -17281,7 +17315,7 @@ function ChangelogEntry({
         borderBottom: "1px solid var(--rule)",
       }}
     >
-      <time dateTime={date} style={{ color: "var(--muted)", fontFamily: "monospace", fontSize: 12 }}>
+      <time dateTime={date} style={{ color: "var(--muted)", fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {date}
       </time>
       <div>

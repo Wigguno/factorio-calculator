@@ -119,7 +119,7 @@ test("React UI renders the complete calculator workflow from one specification",
   }
   assert.match(factoryHtml, /<style>/)
   assert.match(factoryHtml, /data-density="compact"/)
-  assert.match(factoryHtml, /--accent:#ff7200/)
+  assert.match(factoryHtml, /--accent:#e8a04a/)
   assert.match(factoryHtml, /aria-label="Choose output for target 1: Advanced circuit"/)
   assert.match(factoryHtml, /data-target-item-picker="target-output:0"/)
   assert.doesNotMatch(factoryHtml, /aria-label="Search target outputs"/)

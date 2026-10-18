@@ -1,0 +1,4 @@
+IBM Plex Sans (variable, weights 400-600, latin subset) and IBM Plex Mono (weight 500, latin subset).
+Copyright (c) IBM Corp. Licensed under the SIL Open Font License, Version 1.1.
+https://github.com/IBM/plex/blob/master/LICENSE.txt
+https://openfontlicense.org
