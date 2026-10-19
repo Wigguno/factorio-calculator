@@ -12340,6 +12340,23 @@ const UI = {
     borderRadius: "16px 16px 0 0",
     background: "var(--surface)",
   },
+  drawerLayout: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 380px)",
+    gap: 12,
+    alignItems: "start",
+  },
+  rowDrawer: {
+    position: "sticky",
+    top: 8,
+    maxHeight: "calc(100vh - 16px)",
+    overflowY: "auto",
+    padding: "0 14px 14px",
+    border: "1px solid var(--border)",
+    borderTop: "2px solid var(--accent)",
+    borderRadius: 12,
+    background: "var(--surface)",
+  },
   dialogHeader: {
     display: "flex",
     alignItems: "center",
@@ -14132,16 +14149,21 @@ export function getFactoryRows(specification: FactorySpecification, totals: Tota
 function ItemTable({
   specification,
   totals,
+  rows,
   pipette,
+  editingRow,
+  onEdit,
 }: {
   readonly specification: FactorySpecification
   readonly totals: Totals
+  readonly rows: readonly FactoryRow[]
   readonly pipette: ModulePipetteController
+  readonly editingRow: string | null
+  readonly onEdit: (row: FactoryRow) => void
 }) {
   const [expandedItems, setExpandedItems] = useState<ReadonlySet<string>>(() => new Set())
   const [openEquipmentPicker, setOpenEquipmentPicker] = useState<string | null>(null)
   const showLocations = specification.selectedPlanets.size > 1
-  const rows = getFactoryRows(specification, totals)
 
   const toggleExpanded = (key: string) => {
     setExpandedItems((current) => {
@@ -14181,7 +14203,7 @@ function ItemTable({
 
   return (
     <div className="factory-table-scroll" style={UI.tableWrap}>
-      <table className="factory-table" style={{ ...UI.table, minWidth: showLocations ? 1088 : 936 }}>
+      <table className="factory-table" style={{ ...UI.table, minWidth: showLocations ? 1126 : 974 }}>
         <thead>
           <tr>
             <th style={{ ...UI.th, width: 24 }} />
@@ -14220,7 +14242,7 @@ function ItemTable({
             <th className="factory-power" style={{ ...UI.th, width: 152, textAlign: "right" }}>
               Power
             </th>
-            <th className="factory-action" style={{ ...UI.th, width: 46 }} />
+            <th className="factory-action" style={{ ...UI.th, width: 84 }} />
           </tr>
         </thead>
         <tbody>
@@ -14507,14 +14529,15 @@ function ItemTable({
                             )
                           })()}
                   </td>
-                  <td className="factory-action" style={{ ...UI.td, textAlign: "center" }}>
-                    {item === null ? null : (
-                      <a
-                        href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Add ${item.name} as a production target`}
-                        title={`Add ${item.name} as a production target`}
+                  <td className="factory-action" style={UI.td}>
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 2 }}>
+                      <button
+                        id={factoryRowTriggerId(factoryRowIdentity(row))}
+                        type="button"
+                        aria-label={`Edit ${item?.name ?? recipe?.name ?? "row"} in the row editor`}
+                        aria-expanded={editingRow === factoryRowIdentity(row)}
+                        aria-controls={editingRow === factoryRowIdentity(row) ? "factory-row-editor" : undefined}
+                        title="Edit row"
                         style={{
                           ...UI.button,
                           display: "grid",
@@ -14522,15 +14545,51 @@ function ItemTable({
                           minHeight: 28,
                           padding: "0 5px",
                           color: "var(--accent)",
-                          opacity: 0.45,
                           border: 0,
-                          background: "transparent",
-                          textDecoration: "none",
+                          background: editingRow === factoryRowIdentity(row) ? "var(--accent-soft)" : "transparent",
                         }}
+                        onClick={() => onEdit(row)}
                       >
-                        <UiGlyph name="popout" size={24} />
-                      </a>
-                    )}
+                        <svg
+                          aria-hidden="true"
+                          width={20}
+                          height={20}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                        >
+                          <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
+                          <circle cx={16} cy={6} r={2} />
+                          <circle cx={10} cy={12} r={2} />
+                          <circle cx={18} cy={18} r={2} />
+                        </svg>
+                      </button>
+                      {item === null ? null : (
+                        <a
+                          href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Add ${item.name} as a production target`}
+                          title={`Add ${item.name} as a production target`}
+                          style={{
+                            ...UI.button,
+                            display: "grid",
+                            placeItems: "center",
+                            minHeight: 28,
+                            padding: "0 5px",
+                            color: "var(--accent)",
+                            opacity: 0.45,
+                            border: 0,
+                            background: "transparent",
+                            textDecoration: "none",
+                          }}
+                        >
+                          <UiGlyph name="popout" size={24} />
+                        </a>
+                      )}
+                    </span>
                   </td>
                 </tr>
                 {expanded && item !== null ? (
@@ -15720,8 +15779,13 @@ function PlanningDetails({
   )
 }
 
+// Escape pressed on an expanded trigger or inside a non-<dialog> role="dialog" panel belongs to that popover.
+function isNestedPopoverEscape(target: EventTarget | null): boolean {
+  return target instanceof Element && target.closest('[aria-expanded="true"], [role="dialog"]:not(dialog)') !== null
+}
+
 // Native modal dialog: focus trap, inert page, and Escape come from the browser. Escape that closes a nested
-// popover (an expanded trigger or a non-dialog role="dialog" panel) leaves the modal open.
+// popover leaves the modal open.
 function ModalDialog({
   labelledBy,
   style,
@@ -15746,10 +15810,7 @@ function ModalDialog({
       aria-labelledby={labelledBy}
       style={style}
       onKeyDownCapture={(event) => {
-        if (event.key !== "Escape") return
-        const target = event.target
-        escapeClosesPopover.current =
-          target instanceof Element && target.closest('[aria-expanded="true"], [role="dialog"]:not(dialog)') !== null
+        if (event.key === "Escape") escapeClosesPopover.current = isNestedPopoverEscape(event.target)
       }}
       onCancel={(event) => {
         if (escapeClosesPopover.current) event.preventDefault()
@@ -16100,8 +16161,9 @@ function factoryRowIdentity(row: FactoryRow): string {
   return row.recipe === null ? `row:${row.key}` : `recipe:${row.recipe.key}`
 }
 
-function factoryCardId(identity: string): string {
-  return `factory-card-${identity}`
+// The card (compact) or Edit row button (wide) that opened the row editor, for focus return.
+function factoryRowTriggerId(identity: string): string {
+  return `factory-row-trigger-${identity}`
 }
 
 function moduleCountText(
@@ -16142,7 +16204,7 @@ function FactoryCardList({
           <li key={row.key}>
             <button
               type="button"
-              id={factoryCardId(factoryRowIdentity(row))}
+              id={factoryRowTriggerId(factoryRowIdentity(row))}
               className="factory-card"
               data-row-identity={factoryRowIdentity(row)}
               data-item-key={item?.key}
@@ -16321,16 +16383,50 @@ function CompactModuleSlots({
   )
 }
 
+function FactoryRowEditorShell({
+  variant,
+  onClose,
+  children,
+}: {
+  readonly variant: "dialog" | "drawer"
+  readonly onClose: () => void
+  readonly children: ReactNode
+}) {
+  if (variant === "dialog") {
+    return (
+      <ModalDialog labelledBy="factory-row-editor-title" style={UI.fullScreenDialog} onClose={onClose}>
+        {children}
+      </ModalDialog>
+    )
+  }
+  return (
+    <aside
+      id="factory-row-editor"
+      aria-labelledby="factory-row-editor-title"
+      style={UI.rowDrawer}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && !isNestedPopoverEscape(event.target)) onClose()
+      }}
+    >
+      {children}
+    </aside>
+  )
+}
+
+// One row editor in two shells: a full-screen modal dialog on phones and a non-modal side drawer beside the
+// desktop factory table. Both call the same model methods as the inline table controls.
 export function FactoryRowEditor({
   specification,
   totals,
   row,
   onClose,
+  variant = "dialog",
 }: {
   readonly specification: FactorySpecification
   readonly totals: Totals
   readonly row: FactoryRow
   readonly onClose: () => void
+  readonly variant?: "dialog" | "drawer"
 }) {
   const { item, recipe, rate, imported, belts, recipeRate, building, machineQuality, count, moduleSpec, power } = row
   const name = item?.name ?? recipe?.name ?? ""
@@ -16377,11 +16473,13 @@ export function FactoryRowEditor({
   ].filter((part) => part !== null)
 
   return (
-    <ModalDialog labelledBy="factory-row-editor-title" style={UI.fullScreenDialog} onClose={onClose}>
+    <FactoryRowEditorShell variant={variant} onClose={onClose}>
       <header style={UI.dialogHeader}>
-        <button type="button" aria-label="Back to factory" style={UI.iconButton} onClick={onClose}>
-          <UiGlyph name="right" size={18} rotate={180} />
-        </button>
+        {variant === "dialog" ? (
+          <button type="button" aria-label="Back to factory" style={UI.iconButton} onClick={onClose}>
+            <UiGlyph name="right" size={18} rotate={180} />
+          </button>
+        ) : null}
         {icon === undefined ? null : <SpriteIcon icon={icon} size={32} dimmed={imported} title={name} />}
         <div style={{ display: "grid", flex: 1, minWidth: 0 }}>
           <h2 id="factory-row-editor-title" style={{ ...UI.compactTitle, fontSize: 18 }}>
@@ -16389,6 +16487,11 @@ export function FactoryRowEditor({
           </h2>
           <span style={UI.muted}>{machineSummary.join(" · ")}</span>
         </div>
+        {variant === "drawer" ? (
+          <button type="button" aria-label="Close row editor" style={UI.iconButton} onClick={onClose}>
+            ×
+          </button>
+        ) : null}
       </header>
 
       {item === null || recipe === null ? null : (
@@ -16637,39 +16740,7 @@ export function FactoryRowEditor({
           </a>
         </div>
       )}
-    </ModalDialog>
-  )
-}
-
-function CompactFactoryRows({
-  specification,
-  totals,
-  editingRow,
-  onEdit,
-}: {
-  readonly specification: FactorySpecification
-  readonly totals: Totals
-  readonly editingRow: string | null
-  readonly onEdit: (identity: string | null) => void
-}) {
-  const rows = getFactoryRows(specification, totals)
-  const editing = editingRow === null ? null : (rows.find((row) => factoryRowIdentity(row) === editingRow) ?? null)
-  return (
-    <Fragment>
-      <FactoryCardList specification={specification} rows={rows} onOpen={(row) => onEdit(factoryRowIdentity(row))} />
-      {editing === null ? null : (
-        <FactoryRowEditor
-          specification={specification}
-          totals={totals}
-          row={editing}
-          onClose={() => {
-            const identity = factoryRowIdentity(editing)
-            onEdit(null)
-            requestAnimationFrame(() => document.getElementById(factoryCardId(identity))?.focus())
-          }}
-        />
-      )}
-    </Fragment>
+    </FactoryRowEditorShell>
   )
 }
 
@@ -16754,6 +16825,17 @@ function FactoryPanel({
       </div>
     )
   }
+  const rows = getFactoryRows(snapshot.specification, snapshot.totals)
+  const editing = editingRow === null ? null : (rows.find((row) => factoryRowIdentity(row) === editingRow) ?? null)
+  const openRowEditor = (row: FactoryRow) => {
+    const identity = factoryRowIdentity(row)
+    setEditingRow((current) => (current === identity && !compact ? null : identity))
+  }
+  const closeRowEditor = () => {
+    const identity = editingRow
+    setEditingRow(null)
+    if (identity !== null) requestAnimationFrame(() => document.getElementById(factoryRowTriggerId(identity))?.focus())
+  }
   return (
     <div
       id="totals_tab"
@@ -16801,15 +16883,37 @@ function FactoryPanel({
       <FactorySummaryView specification={snapshot.specification} totals={snapshot.totals} compact={compact} />
       {onOpenTargets === undefined ? null : <CompactTargetLine snapshot={snapshot} onOpenTargets={onOpenTargets} />}
       {compact ? (
-        <CompactFactoryRows
+        <FactoryCardList specification={snapshot.specification} rows={rows} onOpen={openRowEditor} />
+      ) : (
+        <div style={editing === null ? undefined : UI.drawerLayout}>
+          <ItemTable
+            specification={snapshot.specification}
+            totals={snapshot.totals}
+            rows={rows}
+            pipette={pipette}
+            editingRow={editingRow}
+            onEdit={openRowEditor}
+          />
+          {editing === null ? null : (
+            <FactoryRowEditor
+              key={editingRow}
+              specification={snapshot.specification}
+              totals={snapshot.totals}
+              row={editing}
+              variant="drawer"
+              onClose={closeRowEditor}
+            />
+          )}
+        </div>
+      )}
+      {compact && editing !== null ? (
+        <FactoryRowEditor
           specification={snapshot.specification}
           totals={snapshot.totals}
-          editingRow={editingRow}
-          onEdit={setEditingRow}
+          row={editing}
+          onClose={closeRowEditor}
         />
-      ) : (
-        <ItemTable specification={snapshot.specification} totals={snapshot.totals} pipette={pipette} />
-      )}
+      ) : null}
       <PlanningDetails specification={snapshot.specification} totals={snapshot.totals} />
     </div>
   )
@@ -18338,6 +18442,10 @@ function HelpPanel() {
             ],
             ["Restore an imported ingredient to the production chain", "Click the icon again, or use the card"],
             ["Change a recipe for one item", "Use the recipe selector in its Factory row or card"],
+            [
+              "Edit every setting for one row in one place",
+              "Click the sliders button at the end of its Factory row; on a phone, tap its card",
+            ],
             [
               "Copy a module and its quality between slots",
               "Hover a module or module choice and press Q; press Q again or Esc to put it away",

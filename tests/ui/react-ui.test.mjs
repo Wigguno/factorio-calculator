@@ -163,7 +163,7 @@ test("compact layout renders factory cards and a bottom tab bar instead of the f
   assert.doesNotMatch(compactFactoryHtml, /aria-label="Factory row density"/)
   assert.match(
     compactFactoryHtml,
-    /<button type="button" id="factory-card-item:advanced-circuit" class="factory-card" data-row-identity="item:advanced-circuit" data-item-key="advanced-circuit" data-recipe-key="advanced-circuit" aria-label="Edit Advanced circuit"/,
+    /<button type="button" id="factory-row-trigger-item:advanced-circuit" class="factory-card" data-row-identity="item:advanced-circuit" data-item-key="advanced-circuit" data-recipe-key="advanced-circuit" aria-label="Edit Advanced circuit"/,
   )
   assert.match(compactFactoryHtml, /Target · <\/span>Assembling machine/)
   assert.doesNotMatch(compactFactoryHtml, /<dialog/)
@@ -210,6 +210,31 @@ test("compact row editor exposes every factory row control", () => {
     html,
     /<a href="#[^"]+" target="_blank" rel="noopener noreferrer"[^>]*>Open Advanced circuit as a new plan<\/a>/,
   )
+})
+
+test("desktop rows open the shared row editor as a side drawer", () => {
+  assert.match(
+    factoryHtml,
+    /<button id="factory-row-trigger-item:advanced-circuit" type="button" aria-label="Edit Advanced circuit in the row editor" aria-expanded="false"/,
+  )
+  assert.doesNotMatch(factoryHtml, /<aside/)
+  assert.doesNotMatch(compactFactoryHtml, /in the row editor/)
+
+  const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
+  const row = rows.find((candidate) => candidate.item?.key === "advanced-circuit")
+  const html = renderToStaticMarkup(
+    createElement(FactoryRowEditor, {
+      specification: runtime.specification,
+      totals: runtime.specification.lastTotals,
+      row,
+      variant: "drawer",
+      onClose: () => undefined,
+    }),
+  )
+  assert.match(html, /^<aside id="factory-row-editor" aria-labelledby="factory-row-editor-title"/)
+  assert.match(html, /aria-label="Close row editor"/)
+  assert.doesNotMatch(html, /Back to factory/)
+  assert.match(html, /role="group" aria-label="Machine for Advanced circuit"/)
 })
 
 test("compact targets screen and sheet expose every target control", () => {

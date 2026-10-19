@@ -142,9 +142,9 @@ All four recommendations were accepted on 2026-10-19.
 2. What should the mockup header's "Row density" button do on cards? **Drop it on mobile.**
 3. Breakpoint: 760px width only, or width plus `pointer: coarse`? **760px width only, so a narrow desktop window gets
    cards too.**
-4. Mockups 4 and 5 show a desktop row-editor drawer and a desktop targets drawer. PLANS.md currently says "do not add a
-   second expanded equipment editor" on desktop. **Treat them as out of scope until that rule is revisited; the mobile
-   row editor should be built so a desktop drawer could reuse it later.**
+4. Mockups 4 and 5 show a desktop row-editor drawer and a desktop targets drawer. **Originally out of scope. Revised
+   2026-10-19: PR 3 adds the row-editor drawer additively (inline controls, ignore toggle, pipette and the targets
+   panel stay). The targets drawer and the read-only table from the mockups are not planned.**
 
 ## Delivery
 
@@ -195,3 +195,11 @@ PR 2 (done 2026-10-19, uncommitted on `mobile-interface`):
 
 Not done: Visualize, Resources and Settings needed no layout changes at 390px (no horizontal overflow), so their
 `max-content` widths were left alone. History entries for the dialogs (Android back) remain deferred, per decision 1.
+
+PR 3 (desktop row drawer, 2026-10-19):
+
+1. Each desktop factory row gets an **Edit row** (sliders) button beside the popout link. It opens `FactoryRowEditor`
+   with `variant="drawer"`: a sticky, non-modal `<aside>` beside the table. The table keeps every inline control, so
+   both stay in sync through the same `FactorySpecification`.
+2. `FactoryPanel` computes `getFactoryRows()` once and passes the rows to the table or the cards and the editor.
+3. Escape (outside nested popovers) or the × button closes the drawer and returns focus to the row's Edit button.

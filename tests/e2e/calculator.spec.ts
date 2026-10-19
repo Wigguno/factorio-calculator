@@ -568,6 +568,49 @@ test("compact target sheet produces the same plan URL as the desktop target row"
   expect(compactHash).toBe(desktopHash)
 })
 
+test("desktop row drawer edits a row beside the table and stays in sync with inline controls", async ({ page }) => {
+  const browserErrors = collectBrowserErrors(page)
+  await page.setViewportSize({ width: 1440, height: 960 })
+  await openReadyCalculator(page)
+
+  const edit = page.getByRole("button", { name: "Edit Advanced circuit in the row editor" })
+  await expect(edit).toHaveAttribute("aria-expanded", "false")
+  await edit.click()
+  const drawer = page.getByRole("complementary", { name: "Advanced circuit" })
+  await expect(drawer).toBeVisible()
+  await expect(edit).toHaveAttribute("aria-expanded", "true")
+  await expect(page.getByRole("dialog")).toHaveCount(0)
+
+  await drawer.getByRole("button", { name: /^Assembling machine 3/ }).click()
+  await expect(page.getByRole("button", { name: "Choose a machine for Advanced circuit" })).toHaveAttribute(
+    "title",
+    /Assembling machine 3/,
+  )
+  await expect(page.getByRole("button", { name: /^Advanced circuit module 4/ })).toBeVisible()
+
+  const inlineBeacons = page.getByLabel("Beacon count for Advanced circuit").first()
+  await inlineBeacons.fill("3")
+  await inlineBeacons.press("Enter")
+  await expect(drawer.getByLabel("Beacon count for Advanced circuit")).toHaveValue("3")
+
+  await drawer.getByRole("button", { name: "Fewer beacons" }).click()
+  await expect(inlineBeacons).toHaveValue("2")
+
+  await drawer.getByRole("button", { name: "Fewer beacons" }).focus()
+  await page.keyboard.press("Escape")
+  await expect(drawer).toHaveCount(0)
+  await expect(edit).toBeFocused()
+
+  await edit.click()
+  await expect(drawer).toBeVisible()
+  await page.getByRole("button", { name: "Edit Iron plate in the row editor" }).click()
+  await expect(page.getByRole("complementary", { name: "Iron plate" })).toBeVisible()
+  await expect(drawer).toHaveCount(0)
+  await page.getByRole("button", { name: "Edit Iron plate in the row editor" }).click()
+  await expect(page.getByRole("complementary")).toHaveCount(0)
+  expect(browserErrors, "uncaught browser errors").toEqual([])
+})
+
 test("factory equipment popovers escape the table scroller and stay inside the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 560 })
   await openReadyCalculator(page)
