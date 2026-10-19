@@ -36,7 +36,7 @@ if (
 }
 if (
   !calculatorHtml.includes('name="description"') ||
-  !calculatorHtml.includes('<link rel="canonical" href="https://anthfgreco.github.io/factorio-calculator/calc.html"')
+  !calculatorHtml.includes('<link rel="canonical" href="https://wigguno.github.io/factorio-calculator/calc.html"')
 ) {
   throw new Error("calc.html is missing its search description or canonical URL")
 }
@@ -88,7 +88,7 @@ if (/20(?:0\d|1\d|2[0-5])-/.test(changelogHtml)) {
 }
 
 const sitemapXml = await readFile(await requireFile("sitemap.xml"), "utf8")
-if (!sitemapXml.includes("https://anthfgreco.github.io/factorio-calculator/calc.html")) {
+if (!sitemapXml.includes("https://wigguno.github.io/factorio-calculator/calc.html")) {
   throw new Error("sitemap.xml is missing the canonical calculator URL")
 }
 

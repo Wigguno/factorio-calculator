@@ -18402,7 +18402,7 @@ function HelpPanel() {
             <span aria-hidden="true"> · </span>
             <span>Space Age</span>
             <span aria-hidden="true"> · </span>
-            <a href="https://github.com/anthfgreco/factorio-calculator" target="_blank" rel="noreferrer">
+            <a href="https://github.com/Wigguno/factorio-calculator" target="_blank" rel="noreferrer">
               Source on GitHub
             </a>
           </div>
@@ -18760,7 +18760,7 @@ export function CalculatorView({ snapshot, commands, compact }: CalculatorViewPr
           {snapshot.activeTab === "settings" ? <SettingsPanel snapshot={snapshot} commands={commands} /> : null}
           {snapshot.activeTab === "help" ? <HelpPanel /> : null}
           <footer style={UI.footer}>
-            <a href="https://github.com/anthfgreco/factorio-calculator" target="_blank" rel="noreferrer">
+            <a href="https://github.com/Wigguno/factorio-calculator" target="_blank" rel="noreferrer">
               Source on GitHub
             </a>
           </footer>
