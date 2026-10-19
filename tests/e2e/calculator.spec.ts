@@ -330,7 +330,7 @@ test("quality factory equipment stays automatic and sprite-only", async ({ page 
   expect(browserErrors, "uncaught browser errors").toEqual([])
 })
 
-test("inline factory controls, resources, and help remain usable at a mobile viewport", async ({ page }) => {
+test("compact layout shows factory cards and bottom tabs without horizontal scrolling", async ({ page }) => {
   const browserErrors = collectBrowserErrors(page)
   await page.setViewportSize({ width: 390, height: 844 })
   await openReadyCalculator(page)
@@ -346,44 +346,128 @@ test("inline factory controls, resources, and help remain usable at a mobile vie
   await page.keyboard.press("Escape")
   await expect(output).toBeFocused()
 
-  const recipePicker = page.getByRole("button", { name: "Enable or disable recipes for Advanced circuit" })
-  await recipePicker.scrollIntoViewIfNeeded()
+  await expect(page.locator(".factory-table")).toHaveCount(0)
+  const cards = page.getByRole("list", { name: "Factory rows" }).getByRole("listitem")
+  await expect(cards.first()).toBeVisible()
+  expect(await cards.count()).toBeGreaterThan(5)
+  await expect(page.getByRole("button", { name: "Edit Advanced circuit" })).toContainText("Target")
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+
+  const tabs = page.getByRole("navigation", { name: "Calculator sections" })
+  await expect(tabs).toBeInViewport()
+  await expect(tabs.getByRole("button", { name: "Factory" })).toHaveAttribute("aria-current", "page")
+  await expect(page.getByRole("heading", { level: 1, name: "Factory" })).toBeVisible()
+
+  await tabs.getByRole("button", { name: "Resources" }).click()
+  await expect(page.getByText(/Drag resources between tiers/)).toBeVisible()
+  await expect(page.getByRole("button", { name: "Restore defaults" })).toBeVisible()
+  await expect.poll(() => new URL(page.url()).hash).not.toBe("")
+  await page.reload()
+  await expect(tabs.getByRole("button", { name: "Resources" })).toHaveAttribute("aria-current", "page")
+  await expect(page.getByRole("heading", { level: 1, name: "Resources" })).toBeVisible()
+
+  await tabs.getByRole("button", { name: "Help" }).click()
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(["Help"])
+  await expect(page.getByRole("heading", { name: "Using the calculator" })).toBeVisible()
+  await expect(page.getByText(/Share the current calculation/)).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+  expect(browserErrors, "uncaught browser errors").toEqual([])
+})
+
+test("compact row editor edits equipment and closes back to its card", async ({ page }) => {
+  const browserErrors = collectBrowserErrors(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openReadyCalculator(page)
+
+  await page.getByRole("button", { name: /^Space platform/ }).click({ modifiers: ["Shift"] })
+  const card = page.getByRole("button", { name: "Edit Advanced circuit" })
+  await card.click()
+  const editor = page.getByRole("dialog", { name: "Advanced circuit" })
+  await expect(editor).toBeVisible()
+
+  const locations = editor.getByRole("group", { name: "Production location for Advanced circuit" })
+  await expect(locations.getByRole("button", { name: /^Automatic/ })).toHaveAttribute("aria-pressed", "true")
+  await locations.getByRole("button", { name: "Nauvis", exact: true }).click()
+  await expect(locations.getByRole("button", { name: "Nauvis", exact: true })).toHaveAttribute("aria-pressed", "true")
+
+  const recipePicker = editor.getByRole("button", { name: "Enable or disable recipes for Advanced circuit" })
   await recipePicker.click()
   const recipeDialog = page.getByRole("dialog", { name: "Recipes for Advanced circuit" })
   await expect(recipeDialog).toBeVisible()
-  await expect(recipeDialog.getByRole("checkbox").first()).toBeVisible()
   const recipeDialogBox = await recipeDialog.boundingBox()
   expect(recipeDialogBox).not.toBeNull()
   expect(recipeDialogBox?.x).toBeGreaterThanOrEqual(0)
-  expect(recipeDialogBox?.y).toBeGreaterThanOrEqual(0)
   expect((recipeDialogBox?.x ?? 0) + (recipeDialogBox?.width ?? 0)).toBeLessThanOrEqual(390)
-  expect((recipeDialogBox?.y ?? 0) + (recipeDialogBox?.height ?? 0)).toBeLessThanOrEqual(844)
   await page.keyboard.press("Escape")
-  await expect(recipePicker).toBeFocused()
   await expect(recipeDialog).toHaveCount(0)
+  await expect(editor).toBeVisible()
 
-  const factoryScroller = page.locator(".factory-table-scroll")
-  await expect(factoryScroller).toBeVisible()
-  await expect.poll(() => factoryScroller.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
-  const machine = page.getByRole("button", { name: "Choose a machine for Advanced circuit" })
-  await machine.scrollIntoViewIfNeeded()
-  await expect(machine).toBeVisible()
-  await machine.click()
-  await page
-    .getByRole("dialog", { name: "Machine and quality for Advanced circuit" })
-    .getByRole("button", { name: /^Assembling machine 3 —/ })
+  await editor.getByRole("button", { name: /^Assembling machine 3/ }).click()
+  await expect(editor.getByRole("button", { name: /^Assembling machine 3/ })).toHaveAttribute("aria-pressed", "true")
+  await editor
+    .getByRole("group", { name: /^Choose module 1/ })
+    .getByRole("button", { name: "Speed module", exact: true })
     .click()
-  await expect(page.getByRole("button", { name: /^Advanced circuit module 1/ })).toBeVisible()
+  await expect(editor.getByRole("button", { name: "Module slot 1: Speed module", exact: true })).toBeVisible()
+  await expect(editor.getByRole("button", { name: "Module slot 2: Empty", exact: true })).toBeVisible()
+  await editor.getByRole("button", { name: "Fill all module slots" }).click()
+  await expect(editor.getByRole("button", { name: "Module slot 4: Speed module", exact: true })).toBeVisible()
+  await editor.getByRole("button", { name: "More beacons" }).click()
+  await expect(editor.getByLabel("Beacon count for Advanced circuit")).toHaveValue("1")
+  expect(await editor.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
 
-  await page.getByRole("button", { name: "Resources" }).click()
-  await expect(page.getByText(/Drag resources between tiers/)).toBeVisible()
-  await expect(page.getByRole("button", { name: "Restore defaults" })).toBeVisible()
-
-  await page.getByRole("button", { name: "Help" }).click()
-  await expect(page.getByRole("heading", { name: "Using the calculator" })).toBeVisible()
-  await expect(page.getByRole("heading", { name: "Useful controls" })).toBeVisible()
-  await expect(page.getByText(/Share the current calculation/)).toBeVisible()
+  await page.keyboard.press("Escape")
+  await expect(editor).toHaveCount(0)
+  await expect(card).toBeFocused()
+  await expect(card).toContainText("Assembling machine 3")
+  await expect(card).toContainText("Speed module ×4")
+  await expect(card).toContainText("1 beacon")
   expect(browserErrors, "uncaught browser errors").toEqual([])
+})
+
+test("compact row editor produces the same plan URL as the desktop factory table", async ({ browser }) => {
+  const editHash = async (width: number, edit: (page: Page) => Promise<void>) => {
+    const page = await browser.newPage({ viewport: { width, height: 844 } })
+    await openReadyCalculator(page)
+    await edit(page)
+    await expect.poll(() => new URL(page.url()).hash).toContain("zip=")
+    const hash = new URL(page.url()).hash
+    await page.close()
+    return hash
+  }
+
+  const compactHash = await editHash(390, async (page) => {
+    await page.getByRole("button", { name: "Edit Advanced circuit" }).click()
+    const editor = page.getByRole("dialog", { name: "Advanced circuit" })
+    await editor.getByRole("button", { name: /^Assembling machine 3/ }).click()
+    await editor
+      .getByRole("group", { name: /^Choose module 1/ })
+      .getByRole("button", { name: "Productivity module 3", exact: true })
+      .click()
+    await editor.getByRole("button", { name: "Fill all module slots" }).click()
+    await editor.getByRole("button", { name: "More beacons" }).click()
+    await expect(editor.getByLabel("Beacon count for Advanced circuit")).toHaveValue("1")
+  })
+
+  const desktopHash = await editHash(1280, async (page) => {
+    const machine = page.getByRole("button", { name: "Choose a machine for Advanced circuit" })
+    await machine.click()
+    await page
+      .getByRole("dialog", { name: "Machine and quality for Advanced circuit" })
+      .getByRole("button", { name: /^Assembling machine 3 —/ })
+      .click()
+    await page.getByRole("button", { name: /^Advanced circuit module 1/ }).click()
+    await page
+      .getByRole("dialog", { name: "Module 1 and quality for Advanced circuit" })
+      .getByRole("button", { name: /^Productivity module 3 for Advanced circuit module 1/ })
+      .click()
+    const beacons = page.getByLabel("Beacon count for Advanced circuit")
+    await beacons.fill("1")
+    await beacons.press("Enter")
+    await expect(beacons).toHaveValue("1")
+  })
+
+  expect(compactHash).toBe(desktopHash)
 })
 
 test("factory equipment popovers escape the table scroller and stay inside the viewport", async ({ page }) => {

@@ -10,6 +10,10 @@
 - Keep Help focused entirely on calculator and Factorio workflows; implementation details do not belong in player-facing copy.
 - Compare desktop and mobile views against the deployed site with Playwright, then run the UI, core, end-to-end, and release checks.
 
+## Mobile interface
+
+- Planned, not started. Plan, next steps and mockups: [`docs/mobile/plan.md`](docs/mobile/plan.md).
+
 ## Completed architecture cutover
 
 - One authored runtime source file: `src/main.tsx`.

@@ -8,9 +8,14 @@ import { setupSpaceAgeFactory } from "../fixtures/factorio-runtime.mjs"
 
 const build = process.env.FACTORIO_TEST_BUILD
 if (!build) throw new Error("FACTORIO_TEST_BUILD is required; run pnpm test:ui")
-const { CalculatorView, QualityPlanView, aggregateRecyclerDisplayRows, qualityPlanDisplayEntries } = await import(
-  pathToFileURL(resolve(build, "main.js")).href
-)
+const {
+  CalculatorView,
+  FactoryRowEditor,
+  QualityPlanView,
+  aggregateRecyclerDisplayRows,
+  getFactoryRows,
+  qualityPlanDisplayEntries,
+} = await import(pathToFileURL(resolve(build, "main.js")).href)
 
 const commands = new Proxy(
   {},
@@ -51,6 +56,9 @@ function render(overrides = {}) {
 }
 
 const factoryHtml = render()
+const compactFactoryHtml = renderToStaticMarkup(
+  createElement(CalculatorView, { commands, snapshot: snapshot(), compact: true }),
+)
 const loadingHtml = render({ status: "loading" })
 const settingsHtml = render({ activeTab: "settings" })
 const graphHtml = render({ activeTab: "graph" })
@@ -140,6 +148,59 @@ test("React UI renders the complete calculator workflow from one specification",
   assert.match(factoryHtml, /data-item-key="light-oil" data-recipe-key="heavy-oil-cracking"/)
   assert.match(factoryHtml, /data-item-key="petroleum-gas" data-recipe-key="light-oil-cracking"/)
   assert.doesNotMatch(factoryHtml, /\son(?:click|change|input|mouseenter|mouseleave)=/i)
+})
+
+test("compact layout renders factory cards and a bottom tab bar instead of the factory table", () => {
+  assert.match(factoryHtml, /data-layout="wide"/)
+  assert.match(compactFactoryHtml, /data-layout="compact"/)
+  assert.doesNotMatch(compactFactoryHtml, /class="factory-table/)
+  assert.match(compactFactoryHtml, /<h1[^>]*>Factory<\/h1>/)
+  assert.match(compactFactoryHtml, /<ul aria-label="Factory rows"/)
+  assert.match(compactFactoryHtml, /<nav class="bottom-tabs"[^>]*aria-label="Calculator sections"/)
+  assert.match(compactFactoryHtml, /<button type="button" aria-current="page"[^>]*><svg[^>]*aria-hidden="true"/)
+  assert.doesNotMatch(compactFactoryHtml, /aria-label="Factory row density"/)
+  assert.match(
+    compactFactoryHtml,
+    /<button type="button" id="factory-card-item:advanced-circuit" class="factory-card" data-row-identity="item:advanced-circuit" data-item-key="advanced-circuit" data-recipe-key="advanced-circuit" aria-label="Edit Advanced circuit"/,
+  )
+  assert.match(compactFactoryHtml, /Target · <\/span>Assembling machine/)
+  assert.doesNotMatch(compactFactoryHtml, /<dialog/)
+
+  const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
+  const cardCount = compactFactoryHtml.match(/class="factory-card"/g)?.length ?? 0
+  assert.equal(cardCount, rows.length)
+  const tableRowCount = factoryHtml.match(/<tr[^>]*data-item-key=/g)?.length ?? 0
+  assert.equal(tableRowCount, rows.filter((row) => row.item !== null).length)
+})
+
+test("compact row editor exposes every factory row control", () => {
+  const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
+  const row = rows.find((candidate) => candidate.item?.key === "advanced-circuit")
+  assert.ok(row)
+  const html = renderToStaticMarkup(
+    createElement(FactoryRowEditor, {
+      specification: runtime.specification,
+      totals: runtime.specification.lastTotals,
+      row,
+      onClose: () => undefined,
+    }),
+  )
+  assert.match(html, /^<dialog aria-labelledby="factory-row-editor-title"/)
+  assert.match(html, /aria-label="Back to factory"/)
+  assert.match(html, /<h2 id="factory-row-editor-title"[^>]*>Advanced circuit<\/h2>/)
+  for (const heading of ["Recipe", "Machine", "Belts", "Breakdown"]) {
+    assert.match(html, new RegExp(`<h3 id="row-editor-[a-z]+"[^>]*>${heading}</h3>`))
+  }
+  assert.match(html, /aria-label="Enable or disable recipes for Advanced circuit"/)
+  assert.match(html, /role="group" aria-label="Machine for Advanced circuit"/)
+  assert.match(html, /aria-pressed="true"[^>]*>.*Automatic \(/)
+  assert.match(html, /aria-label="Belt stacking for Advanced circuit"/)
+  assert.match(html, /Crafts per machine/)
+  assert.match(html, /Ignore this item \(treat as imported\)/)
+  assert.match(
+    html,
+    /<a href="#[^"]+" target="_blank" rel="noopener noreferrer"[^>]*>Open Advanced circuit as a new plan<\/a>/,
+  )
 })
 
 test("factory rows keep lava-melting machines with their primary products", () => {
