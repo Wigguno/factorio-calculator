@@ -14464,8 +14464,8 @@ function ItemTable({
                       <div
                         style={{
                           ...UI.row,
-                          position: "relative",
-                          left: 20,
+                          flexWrap: "nowrap",
+                          marginLeft: 20,
                           gap: 4,
                           justifyContent: "center",
                         }}
@@ -14501,7 +14501,7 @@ function ItemTable({
                   ) : null}
                   <td className="factory-modules" style={UI.td}>
                     {recipe === null || building === null || moduleSpec === null ? null : (
-                      <div style={{ ...UI.row, gap: 2 }}>
+                      <div style={{ ...UI.row, flexWrap: "nowrap", gap: 2 }}>
                         <CopyFriendlyText>
                           {`Modules: ${moduleSelectionText(moduleSpec.modules, moduleSpec.moduleQualities, specification.getNormalQuality())}. `}
                         </CopyFriendlyText>
@@ -14527,7 +14527,7 @@ function ItemTable({
                   </td>
                   <td className="factory-beacons" style={UI.td}>
                     {recipe === null || building === null || moduleSpec === null || !building.canBeacon() ? null : (
-                      <div style={{ ...UI.row, gap: 2 }}>
+                      <div style={{ ...UI.row, flexWrap: "nowrap", gap: 2 }}>
                         <CopyFriendlyText>
                           {`Beacons: ${moduleSpec.beaconCount.toString()} ${qualifiedEquipmentName({ name: "beacon" }, moduleSpec.beaconQuality)}; modules: ${moduleSelectionText(moduleSpec.beaconModules, moduleSpec.beaconModuleQualities, specification.getNormalQuality())}. `}
                         </CopyFriendlyText>

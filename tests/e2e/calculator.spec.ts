@@ -711,6 +711,39 @@ test("compact flow graph starts zoomed in and pans and pinch-zooms with pointers
   expect(browserErrors, "uncaught browser errors").toEqual([])
 })
 
+test("factory table keeps machines, modules, and beacons on one line beside the drawer", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 })
+  await openReadyCalculator(page)
+  await page.getByRole("button", { name: "Choose a machine for Advanced circuit" }).click()
+  await page
+    .getByRole("dialog", { name: "Machine and quality for Advanced circuit" })
+    .getByRole("button", { name: /^Electromagnetic plant —/ })
+    .click()
+  await expect(page.getByRole("button", { name: /^Advanced circuit module 5/ })).toBeVisible()
+
+  const layoutProblems = () =>
+    page.locator("tr[data-item-key]").evaluateAll((rows) =>
+      rows.flatMap((row) => {
+        const machine = row.querySelector("td.factory-machine > div")
+        const modules = row.querySelector("td.factory-modules")
+        const cells = [
+          ...row.querySelectorAll("td.factory-machine > div, td.factory-modules > div, td.factory-beacons > div"),
+        ]
+        const key = row.getAttribute("data-item-key") ?? ""
+        return [
+          ...(machine && modules && machine.getBoundingClientRect().right > modules.getBoundingClientRect().left + 1
+            ? [`${key}: machine overlaps modules`]
+            : []),
+          ...cells.filter((cell) => cell.getBoundingClientRect().height > 40).map(() => `${key}: wrapped`),
+        ]
+      }),
+    )
+  expect(await layoutProblems()).toEqual([])
+  await page.getByRole("button", { name: "Edit Advanced circuit in the row editor" }).click()
+  await expect(page.getByRole("complementary", { name: "Advanced circuit" })).toBeVisible()
+  expect(await layoutProblems()).toEqual([])
+})
+
 test("factory equipment popovers escape the table scroller and stay inside the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 560 })
   await openReadyCalculator(page)
