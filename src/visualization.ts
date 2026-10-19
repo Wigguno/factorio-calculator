@@ -1026,12 +1026,17 @@ function installSvgEvents(svgElement: SVGSVGElement): void {
   const diagramY = y
   const diagramWidth = width
   const diagramHeight = height
-  if (width / height < ASPECT_RATIO) {
-    const newWidth = height * ASPECT_RATIO
+  // A portrait viewport (phones) uses its real aspect ratio and starts with the diagram height filling the
+  // view, so labels stay readable and the reader pans sideways. Landscape viewports keep the fixed ratio.
+  const bounds = svgElement.getBoundingClientRect()
+  const portrait = bounds.width > 0 && bounds.height > bounds.width
+  const aspectRatio = portrait ? bounds.width / bounds.height : ASPECT_RATIO
+  if (width / height < aspectRatio) {
+    const newWidth = height * aspectRatio
     x -= (newWidth - width) / 2
     width = newWidth
-  } else if (width / height > ASPECT_RATIO) {
-    const newHeight = width / ASPECT_RATIO
+  } else if (width / height > aspectRatio) {
+    const newHeight = width / aspectRatio
     y -= (newHeight - height) / 2
     height = newHeight
   }
@@ -1039,7 +1044,15 @@ function installSvgEvents(svgElement: SVGSVGElement): void {
   const originalHeight = height
   y = diagramY
   let scale = MAX_ZOOM_SCALE
+  if (portrait) {
+    scale = Math.min(MAX_ZOOM_SCALE, Math.max(1, Math.ceil((MAX_ZOOM_SCALE * diagramHeight) / originalHeight)))
+    width = originalWidth * (scale / MAX_ZOOM_SCALE)
+    height = originalHeight * (scale / MAX_ZOOM_SCALE)
+    x = diagramX
+  }
   let clickPoint: DOMPoint | null = null
+  const pointers = new Map<number, { clientX: number; clientY: number }>()
+  let pinch: { readonly distance: number; readonly scale: number } | null = null
 
   const clamp = (): void => {
     const middleX = x + width / 2
@@ -1055,55 +1068,82 @@ function installSvgEvents(svgElement: SVGSVGElement): void {
     svg.attr("viewBox", `${x} ${y} ${width} ${height}`)
   }
 
-  const point = (event: MouseEvent): DOMPoint => {
+  const point = (event: { readonly clientX: number; readonly clientY: number }): DOMPoint => {
     const matrix = svgElement.getScreenCTM()
     if (matrix === null) throw new Error("Graph SVG has no screen transform")
     return new DOMPointReadOnly(event.clientX, event.clientY).matrixTransform(matrix.inverse())
   }
 
-  const zoom = (event: WheelEvent): void => {
-    event.preventDefault()
-    const previousScale = scale
-    if (event.deltaY < 0) {
-      if (scale === 1) return
-      scale--
-    } else if (event.deltaY > 0) {
-      if (scale === MAX_ZOOM_SCALE + 2) return
-      scale++
-    }
-    const cursor = point(event)
-    const dx = cursor.x - x
-    const dy = cursor.y - y
-    x = cursor.x - (dx / previousScale) * scale
-    y = cursor.y - (dy / previousScale) * scale
+  const zoomTo = (nextScale: number, anchor: DOMPoint): void => {
+    const clamped = Math.min(MAX_ZOOM_SCALE + 2, Math.max(1, nextScale))
+    if (clamped === scale) return
+    x = anchor.x - ((anchor.x - x) / scale) * clamped
+    y = anchor.y - ((anchor.y - y) / scale) * clamped
+    scale = clamped
     width = originalWidth * (scale / MAX_ZOOM_SCALE)
     height = originalHeight * (scale / MAX_ZOOM_SCALE)
     setViewBox()
   }
 
-  const mouseDown = (event: MouseEvent): void => {
-    clickPoint = point(event)
+  const zoom = (event: WheelEvent): void => {
+    event.preventDefault()
+    if (event.deltaY !== 0) zoomTo(scale + Math.sign(event.deltaY), point(event))
+  }
+
+  // Pointer events cover mouse, pen, and touch: one pointer pans, two pointers pinch-zoom around their midpoint.
+  const pointerDistance = (): number => {
+    const [first, second] = [...pointers.values()]
+    return first === undefined || second === undefined
+      ? 0
+      : Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY)
+  }
+  const pointerDown = (event: PointerEvent): void => {
+    pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY })
+    if (pointers.size === 2) {
+      clickPoint = null
+      pinch = { distance: pointerDistance(), scale }
+    } else if (pointers.size === 1) {
+      clickPoint = point(event)
+    }
     event.preventDefault()
   }
-  const mouseMove = (event: MouseEvent): void => {
-    if (clickPoint === null) return
-    const cursor = point(event)
-    x -= cursor.x - clickPoint.x
-    y -= cursor.y - clickPoint.y
-    setViewBox()
+  const pointerMove = (event: PointerEvent): void => {
+    if (!pointers.has(event.pointerId)) return
+    pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY })
+    if (pinch !== null && pointers.size === 2) {
+      const distance = pointerDistance()
+      if (distance > 0 && pinch.distance > 0) {
+        const [first, second] = [...pointers.values()]
+        if (first !== undefined && second !== undefined) {
+          const middle = point({
+            clientX: (first.clientX + second.clientX) / 2,
+            clientY: (first.clientY + second.clientY) / 2,
+          })
+          zoomTo(Math.round(pinch.scale * (pinch.distance / distance)), middle)
+        }
+      }
+    } else if (clickPoint !== null) {
+      const cursor = point(event)
+      x -= cursor.x - clickPoint.x
+      y -= cursor.y - clickPoint.y
+      setViewBox()
+    }
     event.preventDefault()
   }
-  const mouseUp = (event: MouseEvent): void => {
-    clickPoint = null
-    event.preventDefault()
+  const pointerUp = (event: PointerEvent): void => {
+    pointers.delete(event.pointerId)
+    pinch = null
+    const remaining = [...pointers.values()][0]
+    clickPoint = remaining === undefined ? null : point(remaining)
   }
 
   setViewBox()
   svg
     .on("wheel.visualization", zoom)
-    .on("mousedown.visualization", mouseDown)
-    .on("mousemove.visualization", mouseMove)
-    .on("mouseup.visualization", mouseUp)
+    .on("pointerdown.visualization", pointerDown)
+    .on("pointermove.visualization", pointerMove)
+    .on("pointerup.visualization", pointerUp)
+    .on("pointercancel.visualization", pointerUp)
 }
 
 function finishViewport(options: VisualizationOptions): void {
@@ -1119,6 +1159,7 @@ function finishViewport(options: VisualizationOptions): void {
       .style("height", "70vh")
       .style("min-height", "500px")
       .style("max-height", "780px")
+      .style("touch-action", "none")
     installSvgEvents(svgElement)
     return
   }
@@ -1132,6 +1173,7 @@ function finishViewport(options: VisualizationOptions): void {
     .style("height", null)
     .style("min-height", null)
     .style("max-height", null)
+    .style("touch-action", null)
 }
 
 export function renderVisualization(options: VisualizationOptions): void {

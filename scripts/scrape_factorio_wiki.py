@@ -28,7 +28,7 @@ from typing import Any
 API_URL = "https://wiki.factorio.com/api.php"
 USER_AGENT = (
     "FactorioCalculatorWikiArchiver/1.0 "
-    "(https://github.com/anthfgreco/factorio-calculator)"
+    "(https://github.com/Wigguno/factorio-calculator)"
 )
 DEFAULT_OUTPUT = Path(".tmp/factorio-wiki.sqlite")
 DEFAULT_MARKDOWN_OUTPUT = Path("factorio-wiki.md")

@@ -1,6 +1,6 @@
 # Mobile interface plan
 
-Status: PR 1 committed; PR 2 implemented on branch `mobile-interface` (uncommitted). Drafted 2026-10-18 from the claude.ai artifact "Factorio Calculator – Mobile Mockups"
+Status: PRs 1–3 merged to `master` and live at https://wigguno.github.io/factorio-calculator/calc.html. PR 4 (back button, touch graph, drawer button, housekeeping) on branch `mobile-polish`. Drafted 2026-10-18 from the claude.ai artifact "Factorio Calculator – Mobile Mockups"
 (https://claude.ai/artifact/KXHEY9cz4WG1Q5LMFb8YmB). Line references checked against commit `7f9a0e7`; re-search the
 symbol before trusting a line number.
 
@@ -138,7 +138,8 @@ This plan replaces that with a separate mobile layout. Everything stays inside t
 All four recommendations were accepted on 2026-10-19.
 
 1. Should opening the row editor or Targets screen add a history entry, so Android back closes it? That means a new URL
-   parameter and round-trip tests. **Start with local state; add history later if wanted.**
+   parameter and round-trip tests. **Start with local state; add history later if wanted.** Done in PR 4 without a URL
+   parameter: each modal dialog pushes a same-URL entry.
 2. What should the mockup header's "Row density" button do on cards? **Drop it on mobile.**
 3. Breakpoint: 760px width only, or width plus `pointer: coarse`? **760px width only, so a narrow desktop window gets
    cards too.**
@@ -203,3 +204,18 @@ PR 3 (desktop row drawer, 2026-10-19):
    both stay in sync through the same `FactorySpecification`.
 2. `FactoryPanel` computes `getFactoryRows()` once and passes the rows to the table or the cards and the editor.
 3. Escape (outside nested popovers) or the × button closes the drawer and returns focus to the row's Edit button.
+
+PR 4 (polish, 2026-10-19):
+
+1. **Back button.** Each `ModalDialog` pushes one same-URL history entry (`pushDialogHistoryEntry` in the url-state
+   region). Browser/Android back closes only the top dialog; closing a dialog with its own controls pops its entry with
+   `history.go(-n)`. Either way `consumeDialogHistoryPop` rewrites the revealed entry with the current plan hash, so
+   edits made inside a dialog are never undone by the older hash underneath. The URL format is unchanged. Pressing
+   Forward afterwards re-enters an old dialog entry as ordinary plan history.
+2. **Graph on touch.** `visualization.ts` pans and zooms with pointer events (mouse, pen, touch) and pinch-zooms with
+   two pointers; zoom mode sets `touch-action: none`. Portrait viewports start zoomed so the diagram height fills the
+   view; landscape keeps the 16:9 fit.
+3. **Desktop drawer trigger.** The Edit row (sliders) button moved from the action column to the item column, so it
+   stays visible when the drawer narrows the table.
+4. **Housekeeping.** Status updated, merged `mobile-interface` branch deleted, wiki scraper contact URL points at the
+   fork.

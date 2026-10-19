@@ -10953,6 +10953,44 @@ export function initializeUrlState(): void {
   browserHistory.initialize()
 }
 
+// Each open modal dialog owns one same-URL history entry, so the browser back button closes it. Plan edits made
+// while a dialog is open replace that entry's hash; leaving the entry therefore rewrites the revealed entry with
+// the current plan instead of letting the older hash underneath reload the plan.
+interface DialogHistoryEntry {
+  readonly close: () => void
+  popped: boolean
+}
+
+const dialogHistory: DialogHistoryEntry[] = []
+let pendingDialogHistoryBacks = 0
+
+export function pushDialogHistoryEntry(close: () => void): () => void {
+  const entry: DialogHistoryEntry = { close, popped: false }
+  dialogHistory.push(entry)
+  window.history.pushState(null, "", window.location.href)
+  return () => {
+    const index = dialogHistory.indexOf(entry)
+    if (index !== -1) dialogHistory.splice(index, 1)
+    if (entry.popped) return
+    pendingDialogHistoryBacks++
+    if (pendingDialogHistoryBacks === 1) queueMicrotask(() => window.history.go(-pendingDialogHistoryBacks))
+  }
+}
+
+// Returns true when a popstate left a dialog entry; the caller must not reload the plan from the URL.
+export function consumeDialogHistoryPop(settings: string): boolean {
+  if (pendingDialogHistoryBacks > 0) {
+    pendingDialogHistoryBacks = 0
+  } else {
+    const entry = dialogHistory.pop()
+    if (entry === undefined) return false
+    entry.popped = true
+    entry.close()
+  }
+  browserHistory.sync(settings)
+  return true
+}
+
 export function finishUrlInitialization(): void {
   browserHistory.finishInitialization()
 }
@@ -14203,7 +14241,7 @@ function ItemTable({
 
   return (
     <div className="factory-table-scroll" style={UI.tableWrap}>
-      <table className="factory-table" style={{ ...UI.table, minWidth: showLocations ? 1126 : 974 }}>
+      <table className="factory-table" style={{ ...UI.table, minWidth: showLocations ? 1088 : 936 }}>
         <thead>
           <tr>
             <th style={{ ...UI.th, width: 24 }} />
@@ -14242,7 +14280,7 @@ function ItemTable({
             <th className="factory-power" style={{ ...UI.th, width: 152, textAlign: "right" }}>
               Power
             </th>
-            <th className="factory-action" style={{ ...UI.th, width: 84 }} />
+            <th className="factory-action" style={{ ...UI.th, width: 46 }} />
           </tr>
         </thead>
         <tbody>
@@ -14281,48 +14319,88 @@ function ItemTable({
                     )}
                   </td>
                   <td style={{ ...UI.td, paddingLeft: 3 }}>
-                    {item === null ? null : (
-                      <button
-                        type="button"
-                        title={imported ? "Produce this item in the factory" : "Treat this item as imported"}
-                        style={mergeStyles(UI.button, {
-                          width: "100%",
-                          minHeight: 32,
-                          padding: 0,
-                          border: 0,
-                          background: "transparent",
-                          justifyContent: "flex-start",
-                          textAlign: "left",
-                        })}
-                        onClick={() => runMutation(specification, () => specification.toggleIgnore(item))}
-                      >
-                        <span
-                          className="item-name"
-                          style={{
-                            position: "relative",
-                            display: "inline-flex",
-                            fontWeight: 600,
-                          }}
+                    <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      {item === null ? (
+                        <span style={{ flex: 1 }} />
+                      ) : (
+                        <button
+                          type="button"
+                          title={imported ? "Produce this item in the factory" : "Treat this item as imported"}
+                          style={mergeStyles(UI.button, {
+                            flex: 1,
+                            minWidth: 0,
+                            minHeight: 32,
+                            padding: 0,
+                            border: 0,
+                            background: "transparent",
+                            justifyContent: "flex-start",
+                            textAlign: "left",
+                          })}
+                          onClick={() => runMutation(specification, () => specification.toggleIgnore(item))}
                         >
-                          <IconLabel icon={item.icon} name={item.name} dimmed={imported} size={32} />
-                          {target ? (
-                            <span
-                              style={{
-                                position: "absolute",
-                                top: 20,
-                                left: 39,
-                                color: "var(--accent)",
-                                fontSize: 10,
-                                lineHeight: 1.2,
-                                textTransform: "uppercase",
-                              }}
-                            >
-                              Target
-                            </span>
-                          ) : null}
-                        </span>
+                          <span
+                            className="item-name"
+                            style={{
+                              position: "relative",
+                              display: "inline-flex",
+                              fontWeight: 600,
+                            }}
+                          >
+                            <IconLabel icon={item.icon} name={item.name} dimmed={imported} size={32} />
+                            {target ? (
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  top: 20,
+                                  left: 39,
+                                  color: "var(--accent)",
+                                  fontSize: 10,
+                                  lineHeight: 1.2,
+                                  textTransform: "uppercase",
+                                }}
+                              >
+                                Target
+                              </span>
+                            ) : null}
+                          </span>
+                        </button>
+                      )}
+                      <button
+                        id={factoryRowTriggerId(factoryRowIdentity(row))}
+                        type="button"
+                        aria-label={`Edit ${item?.name ?? recipe?.name ?? "row"} in the row editor`}
+                        aria-expanded={editingRow === factoryRowIdentity(row)}
+                        aria-controls={editingRow === factoryRowIdentity(row) ? "factory-row-editor" : undefined}
+                        title="Edit row"
+                        style={{
+                          ...UI.button,
+                          display: "grid",
+                          placeItems: "center",
+                          minHeight: 28,
+                          padding: "0 5px",
+                          color: "var(--accent)",
+                          border: 0,
+                          background: editingRow === factoryRowIdentity(row) ? "var(--accent-soft)" : "transparent",
+                        }}
+                        onClick={() => onEdit(row)}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          width={20}
+                          height={20}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                        >
+                          <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
+                          <circle cx={16} cy={6} r={2} />
+                          <circle cx={10} cy={12} r={2} />
+                          <circle cx={18} cy={18} r={2} />
+                        </svg>
                       </button>
-                    )}
+                    </span>
                   </td>
                   <td
                     style={{
@@ -14529,15 +14607,14 @@ function ItemTable({
                             )
                           })()}
                   </td>
-                  <td className="factory-action" style={UI.td}>
-                    <span style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 2 }}>
-                      <button
-                        id={factoryRowTriggerId(factoryRowIdentity(row))}
-                        type="button"
-                        aria-label={`Edit ${item?.name ?? recipe?.name ?? "row"} in the row editor`}
-                        aria-expanded={editingRow === factoryRowIdentity(row)}
-                        aria-controls={editingRow === factoryRowIdentity(row) ? "factory-row-editor" : undefined}
-                        title="Edit row"
+                  <td className="factory-action" style={{ ...UI.td, textAlign: "center" }}>
+                    {item === null ? null : (
+                      <a
+                        href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Add ${item.name} as a production target`}
+                        title={`Add ${item.name} as a production target`}
                         style={{
                           ...UI.button,
                           display: "grid",
@@ -14545,51 +14622,15 @@ function ItemTable({
                           minHeight: 28,
                           padding: "0 5px",
                           color: "var(--accent)",
+                          opacity: 0.45,
                           border: 0,
-                          background: editingRow === factoryRowIdentity(row) ? "var(--accent-soft)" : "transparent",
+                          background: "transparent",
+                          textDecoration: "none",
                         }}
-                        onClick={() => onEdit(row)}
                       >
-                        <svg
-                          aria-hidden="true"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                        >
-                          <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
-                          <circle cx={16} cy={6} r={2} />
-                          <circle cx={10} cy={12} r={2} />
-                          <circle cx={18} cy={18} r={2} />
-                        </svg>
-                      </button>
-                      {item === null ? null : (
-                        <a
-                          href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Add ${item.name} as a production target`}
-                          title={`Add ${item.name} as a production target`}
-                          style={{
-                            ...UI.button,
-                            display: "grid",
-                            placeItems: "center",
-                            minHeight: 28,
-                            padding: "0 5px",
-                            color: "var(--accent)",
-                            opacity: 0.45,
-                            border: 0,
-                            background: "transparent",
-                            textDecoration: "none",
-                          }}
-                        >
-                          <UiGlyph name="popout" size={24} />
-                        </a>
-                      )}
-                    </span>
+                        <UiGlyph name="popout" size={24} />
+                      </a>
+                    )}
                   </td>
                 </tr>
                 {expanded && item !== null ? (
@@ -15799,9 +15840,12 @@ function ModalDialog({
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const escapeClosesPopover = useRef(false)
+  const closeRef = useRef(onClose)
+  closeRef.current = onClose
 
   useEffect(() => {
     if (dialog.current?.open === false) dialog.current.showModal()
+    return pushDialogHistoryEntry(() => closeRef.current())
   }, [])
 
   return (
@@ -18444,7 +18488,7 @@ function HelpPanel() {
             ["Change a recipe for one item", "Use the recipe selector in its Factory row or card"],
             [
               "Edit every setting for one row in one place",
-              "Click the sliders button at the end of its Factory row; on a phone, tap its card",
+              "Click the sliders button beside its name in the Factory table; on a phone, tap its card",
             ],
             [
               "Copy a module and its quality between slots",
@@ -18922,7 +18966,8 @@ function loadData(modName: string, settings: Map<string, string>): void {
 
 let initialized = false
 
-function handleUrlHashChange(): void {
+function handleUrlHashChange(event: Event): void {
+  if (event.type === "popstate" && consumeDialogHistoryPop(formatSettings())) return
   const hash = window.location.hash
   if (hash === `#${formatSettings()}`) return
   const settings = loadSettings(hash)

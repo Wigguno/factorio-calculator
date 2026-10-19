@@ -611,6 +611,106 @@ test("desktop row drawer edits a row beside the table and stays in sync with inl
   expect(browserErrors, "uncaught browser errors").toEqual([])
 })
 
+test("browser back closes compact dialogs one level at a time and keeps plan edits", async ({ page }) => {
+  const browserErrors = collectBrowserErrors(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openReadyCompactCalculator(page)
+  const back = () => page.evaluate(() => window.history.back())
+
+  const card = page.getByRole("button", { name: "Edit Advanced circuit" })
+  await card.click()
+  const editor = page.getByRole("dialog", { name: "Advanced circuit" })
+  await editor.getByRole("button", { name: /^Assembling machine 3/ }).click()
+  await expect(editor.getByRole("button", { name: /^Assembling machine 3/ })).toHaveAttribute("aria-pressed", "true")
+  const editedHash = new URL(page.url()).hash
+  expect(editedHash).toContain("zip=")
+
+  await back()
+  await expect(editor).toHaveCount(0)
+  await expect.poll(() => new URL(page.url()).hash).toBe(editedHash)
+  await expect(card).toContainText("Assembling machine 3")
+
+  await page.getByRole("button", { name: "Targets (1)" }).click()
+  const screen = page.getByRole("dialog", { name: "Production targets" })
+  await screen.getByRole("button", { name: "Edit target 1: Advanced circuit" }).click()
+  const sheet = page.getByRole("dialog", { name: "Edit target 1" })
+  await sheet.getByRole("button", { name: "Rate", exact: true }).click()
+  const rate = sheet.getByLabel("Rate for Advanced circuit")
+  await rate.fill("12")
+  await rate.press("Enter")
+  await expect(rate).toHaveValue("12")
+  const targetHash = new URL(page.url()).hash
+  await back()
+  await expect(sheet).toHaveCount(0)
+  await expect(screen).toBeVisible()
+  await back()
+  await expect(screen).toHaveCount(0)
+  await expect.poll(() => new URL(page.url()).hash).toBe(targetHash)
+  await expect(page.getByText("Advanced circuit · 12/m")).toBeVisible()
+
+  await card.click()
+  await editor.getByRole("button", { name: "Back to factory" }).click()
+  await expect(editor).toHaveCount(0)
+  await expect.poll(() => new URL(page.url()).hash).toBe(targetHash)
+  await card.click()
+  await expect(editor).toBeVisible()
+  await back()
+  await expect(editor).toHaveCount(0)
+  await expect.poll(() => new URL(page.url()).hash).toBe(targetHash)
+  expect(browserErrors, "uncaught browser errors").toEqual([])
+})
+
+test("compact flow graph starts zoomed in and pans and pinch-zooms with pointers", async ({ page }) => {
+  const browserErrors = collectBrowserErrors(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openReadyCompactCalculator(page)
+  await page.getByRole("navigation", { name: "Calculator sections" }).getByRole("button", { name: "Visualize" }).click()
+  const graph = page.locator("#graph")
+  await expect(graph.locator("g").first()).toBeAttached()
+  await expect(graph).toHaveCSS("touch-action", "none")
+
+  const viewBox = async () => (await graph.getAttribute("viewBox"))?.split(" ").map(Number) ?? []
+  await expect.poll(async () => (await viewBox()).length).toBe(4)
+  const diagramWidth = await graph.evaluate((svg) => (svg as SVGSVGElement).getBBox().width)
+  const [startX, , startWidth] = await viewBox()
+  expect(startWidth).toBeLessThan(diagramWidth)
+
+  const box = await graph.boundingBox()
+  if (box === null) throw new Error("Graph has no box")
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(box.x + box.width / 2 - 120, box.y + box.height / 2, { steps: 4 })
+  await page.mouse.up()
+  const [pannedX] = await viewBox()
+  expect(pannedX).toBeGreaterThan(startX ?? 0)
+
+  await graph.evaluate((svg) => {
+    const rect = svg.getBoundingClientRect()
+    const cx = rect.x + rect.width / 2
+    const cy = rect.y + rect.height / 2
+    const fire = (type: string, pointerId: number, clientX: number) =>
+      svg.dispatchEvent(
+        new PointerEvent(type, {
+          pointerId,
+          pointerType: "touch",
+          clientX,
+          clientY: cy,
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+    fire("pointerdown", 11, cx - 20)
+    fire("pointerdown", 12, cx + 20)
+    fire("pointermove", 11, cx - 80)
+    fire("pointermove", 12, cx + 80)
+    fire("pointerup", 11, cx - 80)
+    fire("pointerup", 12, cx + 80)
+  })
+  const [, , pinchedWidth] = await viewBox()
+  expect(pinchedWidth).toBeLessThan(startWidth ?? 0)
+  expect(browserErrors, "uncaught browser errors").toEqual([])
+})
+
 test("factory equipment popovers escape the table scroller and stay inside the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 560 })
   await openReadyCalculator(page)
