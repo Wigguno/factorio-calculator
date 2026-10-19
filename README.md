@@ -4,7 +4,7 @@ A browser-based production planner for **Factorio: Space Age 2.1.14**. Build a f
 
 ## Live site
 
-https://anthfgreco.github.io/factorio-calculator/
+https://wigguno.github.io/factorio-calculator/
 
 ## Features
 
