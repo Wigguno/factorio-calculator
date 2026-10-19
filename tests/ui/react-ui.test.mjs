@@ -12,6 +12,8 @@ const {
   CalculatorView,
   FactoryRowEditor,
   QualityPlanView,
+  TargetSheet,
+  TargetsScreen,
   aggregateRecyclerDisplayRows,
   getFactoryRows,
   qualityPlanDisplayEntries,
@@ -165,6 +167,13 @@ test("compact layout renders factory cards and a bottom tab bar instead of the f
   )
   assert.match(compactFactoryHtml, /Target · <\/span>Assembling machine/)
   assert.doesNotMatch(compactFactoryHtml, /<dialog/)
+  assert.doesNotMatch(compactFactoryHtml, /aria-labelledby="targets-title"/)
+  assert.doesNotMatch(compactFactoryHtml, /class="target-grid"/)
+  assert.match(compactFactoryHtml, />Targets \(1\)<\/button>/)
+  assert.match(compactFactoryHtml, /aria-label="Copy plan link"/)
+  assert.match(compactFactoryHtml, />Edit targets<\/button>/)
+  assert.match(compactFactoryHtml, /Advanced circuit · <span[^>]*>1\/m<\/span>/)
+  assert.match(factoryHtml, /aria-labelledby="targets-title"/)
 
   const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
   const cardCount = compactFactoryHtml.match(/class="factory-card"/g)?.length ?? 0
@@ -201,6 +210,37 @@ test("compact row editor exposes every factory row control", () => {
     html,
     /<a href="#[^"]+" target="_blank" rel="noopener noreferrer"[^>]*>Open Advanced circuit as a new plan<\/a>/,
   )
+})
+
+test("compact targets screen and sheet expose every target control", () => {
+  const screenHtml = renderToStaticMarkup(
+    createElement(TargetsScreen, { commands, snapshot: snapshot(), onClose: () => undefined }),
+  )
+  assert.match(screenHtml, /^<dialog aria-labelledby="targets-screen-title"/)
+  assert.match(screenHtml, /<h2 id="targets-screen-title"[^>]*>Production targets<\/h2>/)
+  assert.match(screenHtml, />\+ Add target<\/button>/)
+  assert.match(screenHtml, /aria-label="Edit target 1: Advanced circuit"/)
+  assert.match(screenHtml, /aria-label="Production locations"/)
+  assert.match(screenHtml, /Tap to add or remove a location\./)
+  assert.doesNotMatch(screenHtml, /Shift-click/)
+  assert.match(screenHtml, /aria-label="Apply preset"/)
+
+  const sheetHtml = renderToStaticMarkup(
+    createElement(TargetSheet, { snapshot: snapshot(), target, onClose: () => undefined }),
+  )
+  assert.match(sheetHtml, /^<dialog aria-labelledby="target-sheet-title"/)
+  assert.match(sheetHtml, /aria-label="Remove Advanced circuit target"/)
+  assert.match(sheetHtml, /aria-label="Search target outputs"/)
+  assert.doesNotMatch(sheetHtml, /Select [^"]+ as output/)
+  assert.match(sheetHtml, /role="group" aria-label="Specify by"/)
+  assert.match(sheetHtml, /aria-pressed="true"[^>]*>Rate<\/button>/)
+  assert.match(sheetHtml, />Machines<\/button>/)
+  assert.match(sheetHtml, />Belts<\/button>/)
+  assert.match(sheetHtml, /aria-label="Rate for Advanced circuit"/)
+  assert.match(sheetHtml, /aria-label="Decrease"/)
+  assert.match(sheetHtml, /aria-label="Increase"/)
+  assert.match(sheetHtml, /aria-label="Quality for Advanced circuit"/)
+  assert.match(sheetHtml, />Done<\/button>/)
 })
 
 test("factory rows keep lava-melting machines with their primary products", () => {

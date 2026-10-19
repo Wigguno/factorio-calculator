@@ -1,6 +1,6 @@
 # Mobile interface plan
 
-Status: PR 1 implemented on branch `mobile-interface` (uncommitted); PR 2 not started. Drafted 2026-10-18 from the claude.ai artifact "Factorio Calculator – Mobile Mockups"
+Status: PR 1 committed; PR 2 implemented on branch `mobile-interface` (uncommitted). Drafted 2026-10-18 from the claude.ai artifact "Factorio Calculator – Mobile Mockups"
 (https://claude.ai/artifact/KXHEY9cz4WG1Q5LMFb8YmB). Line references checked against commit `7f9a0e7`; re-search the
 symbol before trusting a line number.
 
@@ -174,5 +174,24 @@ PR 1, in order. Each step should leave the app working at both widths.
 9. ~~**Gate.**~~ Done 2026-10-19: `pnpm verify` and `test:e2e` (12) pass. Initial JS 539,622 B / 151,652 B gzip
    (+18,002 B / +4,273 B).
 
-Then PR 2: Targets screen and `<dialog>` sheet, other-tab pass, `pointer: coarse` sizing, deletion of the old 760px
-table/target-grid CSS, and the remaining Playwright coverage.
+PR 2 (done 2026-10-19, uncommitted on `mobile-interface`):
+
+1. ~~**Targets screen.**~~ `TargetsScreen` (full-screen modal) lists targets, adds them, and holds locations and presets.
+   It opens from the header **Targets (N)** button and from the target line under the factory summary. On phones the
+   desktop `TargetsPanel` is no longer rendered; the header carries **Copy plan link**.
+2. ~~**Target sheet.**~~ `TargetSheet` is a nested bottom-sheet `<dialog>`: current item plus search (grid only while
+   searching), Rate / Machines / Belts switch (chooses which value to edit; nothing changes until a value is
+   committed), −/+ stepper to the next whole number, quality, readout of the other quantities, Remove and Done.
+3. ~~**Locations on touch.**~~ `LocationSelector compact` toggles on tap, because phones have no Shift-click.
+4. ~~**Shared code.**~~ `ModalDialog` now owns showModal, nested-popover Escape and close for all three dialogs;
+   `filterTargetItems`/`TargetItemGrid` and `PresetSelect` are shared with desktop.
+5. ~~**Touch sizing.**~~ `--control-height` (36px, 44px under `pointer: coarse`) drives `UI.control`, `UI.button`,
+   `UI.primaryButton` and `UI.dangerButton`.
+6. ~~**Old CSS.**~~ Removed the 760px rules for the target grid, planner toolbar, desktop tabs, wide summary and
+   factory table, which phones no longer render.
+7. ~~**Help.**~~ Control descriptions now cover the phone equivalents.
+8. ~~**Tests.**~~ UI test for the Targets screen and sheet; Playwright tests for the targets flow and for target-sheet
+   vs desktop URL-hash equivalence. `pnpm verify` and `test:e2e` (14) pass. Initial JS 547,610 B / 153,536 B gzip.
+
+Not done: Visualize, Resources and Settings needed no layout changes at 390px (no horizontal overflow), so their
+`max-content` widths were left alone. History entries for the dialogs (Android back) remain deferred, per decision 1.
