@@ -30,7 +30,7 @@ summary { list-style-position: outside; }
 @media (pointer: coarse) { .calculator-app { --control-height: 44px; } }
 .target-header, .target-grid { grid-template-columns: 32px 220px 110px 72px 88px 88px; }
 .target-grid > label > span:first-child, .target-output > span:first-child { display: none; }
-.planner-toolbar > label > span { font-size: 11.52px !important; text-transform: uppercase; letter-spacing: 0.04em; }
+.planner-controls > label > span { font-size: 11.52px !important; text-transform: uppercase; letter-spacing: 0.04em; }
 .density-switch label { position: relative; display: inline-block; }
 .density-switch input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .density-switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -13441,30 +13441,40 @@ function TargetsPanel({ snapshot, commands }: CalculatorViewProps) {
         }}
       >
         <LocationSelector specification={specification} />
-        <Field
-          label="Preset"
-          style={{
-            width: 220,
-            gridTemplateColumns: "auto 158px",
-            alignItems: "center",
-            gap: 8,
-            paddingLeft: 12,
-            borderLeft: "1px solid var(--rule)",
-          }}
+        {/* Preset and Copy plan link wrap together so neither is stranded on a line of its own. */}
+        <div
+          className="planner-controls"
+          style={{ display: "flex", flex: "1 0 auto", flexWrap: "nowrap", alignItems: "center", gap: 13.3 }}
         >
-          <PresetSelect
-            snapshot={snapshot}
-            commands={commands}
-            style={{ width: 158, minHeight: 30, fontSize: 13.75 }}
-          />
-        </Field>
-        <div className="planner-actions" style={{ ...UI.row, marginLeft: "auto" }}>
-          <span role="status" aria-live="polite" style={UI.muted}>
-            {snapshot.shareStatus}
-          </span>
-          <button type="button" style={UI.button} onClick={() => void commands.copyShareLink()}>
-            Copy plan link
-          </button>
+          <Field
+            label="Preset"
+            style={{
+              width: 220,
+              gridTemplateColumns: "auto 158px",
+              alignItems: "center",
+              gap: 8,
+              paddingLeft: 12,
+              borderLeft: "1px solid var(--rule)",
+            }}
+          >
+            <PresetSelect
+              snapshot={snapshot}
+              commands={commands}
+              style={{ width: 158, minHeight: 30, fontSize: 13.75 }}
+            />
+          </Field>
+          <div className="planner-actions" style={{ ...UI.row, flexWrap: "nowrap", marginLeft: "auto" }}>
+            <span role="status" aria-live="polite" style={{ ...UI.muted, whiteSpace: "nowrap" }}>
+              {snapshot.shareStatus}
+            </span>
+            <button
+              type="button"
+              style={{ ...UI.button, whiteSpace: "nowrap" }}
+              onClick={() => void commands.copyShareLink()}
+            >
+              Copy plan link
+            </button>
+          </div>
         </div>
       </div>
     </section>

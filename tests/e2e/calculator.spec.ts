@@ -744,6 +744,24 @@ test("factory table keeps machines, modules, and beacons on one line beside the 
   expect(await layoutProblems()).toEqual([])
 })
 
+test("preset and copy plan link wrap together as the targets toolbar narrows", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 800 })
+  await openReadyCalculator(page)
+  const preset = page.getByLabel("Apply preset")
+  const copy = page.getByRole("button", { name: "Copy plan link" })
+  for (const width of [1440, 1100, 1024, 900, 770]) {
+    await page.setViewportSize({ width, height: 800 })
+    const presetBox = await preset.boundingBox()
+    const copyBox = await copy.boundingBox()
+    expect(presetBox, `preset at ${width}px`).not.toBeNull()
+    expect(copyBox, `copy at ${width}px`).not.toBeNull()
+    const presetMiddle = (presetBox?.y ?? 0) + (presetBox?.height ?? 0) / 2
+    const copyMiddle = (copyBox?.y ?? 0) + (copyBox?.height ?? 0) / 2
+    expect(Math.abs(presetMiddle - copyMiddle), `same line at ${width}px`).toBeLessThan(4)
+    expect((copyBox?.x ?? 0) + (copyBox?.width ?? 0)).toBeLessThanOrEqual(width)
+  }
+})
+
 test("factory equipment popovers escape the table scroller and stay inside the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 560 })
   await openReadyCalculator(page)
