@@ -762,6 +762,22 @@ test("preset and copy plan link wrap together as the targets toolbar narrows", a
   }
 })
 
+test("graph summary stays beside the visualise controls on desktop widths", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 800 })
+  await openReadyCalculator(page)
+  await page.getByRole("button", { name: "Visualise" }).click()
+  const summary = page.getByText(/\d+ processes · \d+ flows/)
+  await expect(summary).toBeVisible()
+  for (const width of [1440, 1024, 880, 800, 770]) {
+    await page.setViewportSize({ width, height: 800 })
+    const sameLine = await summary.evaluate((element) => {
+      const controls = element.parentElement?.firstElementChild?.getBoundingClientRect()
+      return controls !== undefined && element.getBoundingClientRect().top < controls.bottom
+    })
+    expect(sameLine, `summary beside controls at ${width}px`).toBe(true)
+  }
+})
+
 test("factory equipment popovers escape the table scroller and stay inside the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 560 })
   await openReadyCalculator(page)

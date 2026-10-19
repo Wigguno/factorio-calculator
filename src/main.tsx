@@ -17127,7 +17127,10 @@ function GraphPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
             </label>
           ))}
         </fieldset>
-        <span style={{ ...UI.muted, marginLeft: "auto" }}>
+        <span
+          className="graph-summary"
+          style={{ ...UI.muted, flex: "1 1 160px", minWidth: 0, textAlign: "right", textWrap: "balance" }}
+        >
           {processCount} processes · {flowCount} flows · Hover or click a process to trace its flows.
         </span>
       </div>
