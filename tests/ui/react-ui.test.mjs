@@ -113,7 +113,7 @@ test("React UI renders the complete calculator workflow from one specification",
   for (const text of [
     "Production targets",
     "Factory",
-    "Visualize",
+    "Visualise",
     "Resources",
     "Settings",
     "Help",

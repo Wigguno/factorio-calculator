@@ -13483,7 +13483,7 @@ function TargetsPanel({ snapshot, commands }: CalculatorViewProps) {
 
 const CALCULATOR_TABS: readonly (readonly [CalculatorTab, string])[] = [
   ["totals", "Factory"],
-  ["graph", "Visualize"],
+  ["graph", "Visualise"],
   ["resources", "Resources"],
   ["settings", "Settings"],
   ["help", "Help"],
@@ -17133,7 +17133,7 @@ function GraphPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
       </div>
       {renderError === null ? null : (
         <div style={UI.error} role="alert">
-          Unable to render visualization: {renderError}
+          Unable to render visualisation: {renderError}
         </div>
       )}
       <div style={UI.graphWrap}>
@@ -17954,9 +17954,9 @@ function QualityPlannerSettings({ snapshot }: { readonly snapshot: CalculatorSna
           marginTop: 8,
         }}
       >
-        <span>Optimize quality for</span>
+        <span>Optimise quality for</span>
         <select
-          aria-label="Quality factory optimization objective"
+          aria-label="Quality factory optimisation objective"
           value={specification.qualityPlannerObjective}
           style={compactSettingControl}
           onChange={(event) =>
@@ -17974,7 +17974,7 @@ function QualityPlannerSettings({ snapshot }: { readonly snapshot: CalculatorSna
       </label>
       <div style={{ ...UI.muted, marginTop: 5, maxWidth: 510 }}>
         For self-recycling ores, choose whether to save raw ore or save quality modules. Miners and recyclers are
-        optimized together, and speed beacons can be used on either.
+        optimised together, and speed beacons can be used on either.
       </div>
     </SettingsRow>
   )
@@ -18479,7 +18479,7 @@ function HelpPanel() {
             Open <strong>Factory</strong> to choose recipes, machines, modules, and imported ingredients.
           </li>
           <li>
-            Check <strong>Resources</strong> and <strong>Visualize</strong> for totals and bottlenecks.
+            Check <strong>Resources</strong> and <strong>Visualise</strong> for totals and bottlenecks.
           </li>
         </ol>
       </HelpSection>
@@ -18548,7 +18548,7 @@ function HelpPanel() {
             <li>Added Vulcanus LDS and concrete quality shuffles to the practical Legendary planner.</li>
             <li>Full Legendary now includes the Late Space Age research, belts, stacking, and machine baseline.</li>
             <li>
-              Self-recycling mined resources now optimize no-beacon through the Quality factory mining limits for beacon
+              Self-recycling mined resources now optimise no-beacon through the Quality factory mining limits for beacon
               count, beacon quality, and speed-module quality. Results show expected Legendary/min per miner plus the
               throughput × (mining quality + recycler quality / 3) comparison score.
             </li>

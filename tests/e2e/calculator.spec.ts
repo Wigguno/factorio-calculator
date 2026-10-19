@@ -173,11 +173,11 @@ test("Factorio productivity is copied and pasted without replacing the plan", as
   await expect(page.getByLabel("Steel plate productivity bonus percentage")).toHaveValue("90")
 })
 
-test("Visualize renders the original Dagre/D3 flow and recipe graphs", async ({ page }) => {
+test("Visualise renders the original Dagre/D3 flow and recipe graphs", async ({ page }) => {
   const browserErrors = collectBrowserErrors(page)
   await openReadyCalculator(page)
 
-  await page.getByRole("button", { name: "Visualize" }).click()
+  await page.getByRole("button", { name: "Visualise" }).click()
   const graph = page.getByRole("img", { name: "Factory recipe flow graph" })
   await expect(graph).toBeVisible()
   await expect(graph.locator("g.link").first()).toBeAttached()
@@ -664,7 +664,7 @@ test("compact flow graph starts zoomed in and pans and pinch-zooms with pointers
   const browserErrors = collectBrowserErrors(page)
   await page.setViewportSize({ width: 390, height: 844 })
   await openReadyCompactCalculator(page)
-  await page.getByRole("navigation", { name: "Calculator sections" }).getByRole("button", { name: "Visualize" }).click()
+  await page.getByRole("navigation", { name: "Calculator sections" }).getByRole("button", { name: "Visualise" }).click()
   const graph = page.locator("#graph")
   await expect(graph.locator("g").first()).toBeAttached()
   await expect(graph).toHaveCSS("touch-action", "none")
