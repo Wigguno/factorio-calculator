@@ -5,10 +5,14 @@
 - Match the deployed calculator's player-facing Factory, Settings, and Help views while keeping current calculator behavior intact.
 - Restore the sprite-backed item, recipe, machine, module, beacon, fuel, belt, quality, and research icon treatments.
 - Preserve the deployed Settings hierarchy, recipe browser density, Factory row pairing, and compact item breakdowns.
-- Keep machine, module, beacon, equipment-quality, and multi-planet location changes inline in each Factory row; do not add a second expanded equipment editor.
+- Keep machine, module, beacon, equipment-quality, and multi-planet location changes inline in each Factory row. The row editor (a side drawer on desktop, a full-screen dialog on phones) is the one additional editor; it reuses the same model methods and must not diverge from the inline controls.
 - Keep the production-target chooser searchable and sprite-first, and retain access to every inline Factory control through horizontal scrolling on narrow screens.
 - Keep Help focused entirely on calculator and Factorio workflows; implementation details do not belong in player-facing copy.
 - Compare desktop and mobile views against the deployed site with Playwright, then run the UI, core, end-to-end, and release checks.
+
+## Mobile interface
+
+- Compact layout, Targets screen and desktop row drawer: see [`docs/mobile/plan.md`](docs/mobile/plan.md).
 
 ## Completed architecture cutover
 

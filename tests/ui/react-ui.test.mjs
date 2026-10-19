@@ -8,9 +8,16 @@ import { setupSpaceAgeFactory } from "../fixtures/factorio-runtime.mjs"
 
 const build = process.env.FACTORIO_TEST_BUILD
 if (!build) throw new Error("FACTORIO_TEST_BUILD is required; run pnpm test:ui")
-const { CalculatorView, QualityPlanView, aggregateRecyclerDisplayRows, qualityPlanDisplayEntries } = await import(
-  pathToFileURL(resolve(build, "main.js")).href
-)
+const {
+  CalculatorView,
+  FactoryRowEditor,
+  QualityPlanView,
+  TargetSheet,
+  TargetsScreen,
+  aggregateRecyclerDisplayRows,
+  getFactoryRows,
+  qualityPlanDisplayEntries,
+} = await import(pathToFileURL(resolve(build, "main.js")).href)
 
 const commands = new Proxy(
   {},
@@ -51,6 +58,9 @@ function render(overrides = {}) {
 }
 
 const factoryHtml = render()
+const compactFactoryHtml = renderToStaticMarkup(
+  createElement(CalculatorView, { commands, snapshot: snapshot(), compact: true }),
+)
 const loadingHtml = render({ status: "loading" })
 const settingsHtml = render({ activeTab: "settings" })
 const graphHtml = render({ activeTab: "graph" })
@@ -140,6 +150,122 @@ test("React UI renders the complete calculator workflow from one specification",
   assert.match(factoryHtml, /data-item-key="light-oil" data-recipe-key="heavy-oil-cracking"/)
   assert.match(factoryHtml, /data-item-key="petroleum-gas" data-recipe-key="light-oil-cracking"/)
   assert.doesNotMatch(factoryHtml, /\son(?:click|change|input|mouseenter|mouseleave)=/i)
+})
+
+test("compact layout renders factory cards and a bottom tab bar instead of the factory table", () => {
+  assert.match(factoryHtml, /data-layout="wide"/)
+  assert.match(compactFactoryHtml, /data-layout="compact"/)
+  assert.doesNotMatch(compactFactoryHtml, /class="factory-table/)
+  assert.match(compactFactoryHtml, /<h1[^>]*>Factory<\/h1>/)
+  assert.match(compactFactoryHtml, /<ul aria-label="Factory rows"/)
+  assert.match(compactFactoryHtml, /<nav class="bottom-tabs"[^>]*aria-label="Calculator sections"/)
+  assert.match(compactFactoryHtml, /<button type="button" aria-current="page"[^>]*><svg[^>]*aria-hidden="true"/)
+  assert.doesNotMatch(compactFactoryHtml, /aria-label="Factory row density"/)
+  assert.match(
+    compactFactoryHtml,
+    /<button type="button" id="factory-row-trigger-item:advanced-circuit" class="factory-card" data-row-identity="item:advanced-circuit" data-item-key="advanced-circuit" data-recipe-key="advanced-circuit" aria-label="Edit Advanced circuit"/,
+  )
+  assert.match(compactFactoryHtml, /Target · <\/span>Assembling machine/)
+  assert.doesNotMatch(compactFactoryHtml, /<dialog/)
+  assert.doesNotMatch(compactFactoryHtml, /aria-labelledby="targets-title"/)
+  assert.doesNotMatch(compactFactoryHtml, /class="target-grid"/)
+  assert.match(compactFactoryHtml, />Targets \(1\)<\/button>/)
+  assert.match(compactFactoryHtml, /aria-label="Copy plan link"/)
+  assert.match(compactFactoryHtml, />Edit targets<\/button>/)
+  assert.match(compactFactoryHtml, /Advanced circuit · <span[^>]*>1\/m<\/span>/)
+  assert.match(factoryHtml, /aria-labelledby="targets-title"/)
+
+  const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
+  const cardCount = compactFactoryHtml.match(/class="factory-card"/g)?.length ?? 0
+  assert.equal(cardCount, rows.length)
+  const tableRowCount = factoryHtml.match(/<tr[^>]*data-item-key=/g)?.length ?? 0
+  assert.equal(tableRowCount, rows.filter((row) => row.item !== null).length)
+})
+
+test("compact row editor exposes every factory row control", () => {
+  const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
+  const row = rows.find((candidate) => candidate.item?.key === "advanced-circuit")
+  assert.ok(row)
+  const html = renderToStaticMarkup(
+    createElement(FactoryRowEditor, {
+      specification: runtime.specification,
+      totals: runtime.specification.lastTotals,
+      row,
+      onClose: () => undefined,
+    }),
+  )
+  assert.match(html, /^<dialog aria-labelledby="factory-row-editor-title"/)
+  assert.match(html, /aria-label="Back to factory"/)
+  assert.match(html, /<h2 id="factory-row-editor-title"[^>]*>Advanced circuit<\/h2>/)
+  for (const heading of ["Recipe", "Machine", "Belts", "Breakdown"]) {
+    assert.match(html, new RegExp(`<h3 id="row-editor-[a-z]+"[^>]*>${heading}</h3>`))
+  }
+  assert.match(html, /aria-label="Enable or disable recipes for Advanced circuit"/)
+  assert.match(html, /role="group" aria-label="Machine for Advanced circuit"/)
+  assert.match(html, /aria-pressed="true"[^>]*>.*Automatic \(/)
+  assert.match(html, /aria-label="Belt stacking for Advanced circuit"/)
+  assert.match(html, /Crafts per machine/)
+  assert.match(html, /Ignore this item \(treat as imported\)/)
+  assert.match(
+    html,
+    /<a href="#[^"]+" target="_blank" rel="noopener noreferrer"[^>]*>Open Advanced circuit as a new plan<\/a>/,
+  )
+})
+
+test("desktop rows open the shared row editor as a side drawer", () => {
+  assert.match(
+    factoryHtml,
+    /<button id="factory-row-trigger-item:advanced-circuit" type="button" aria-label="Edit Advanced circuit in the row editor" aria-expanded="false"/,
+  )
+  assert.doesNotMatch(factoryHtml, /<aside/)
+  assert.doesNotMatch(compactFactoryHtml, /in the row editor/)
+
+  const rows = getFactoryRows(runtime.specification, runtime.specification.lastTotals)
+  const row = rows.find((candidate) => candidate.item?.key === "advanced-circuit")
+  const html = renderToStaticMarkup(
+    createElement(FactoryRowEditor, {
+      specification: runtime.specification,
+      totals: runtime.specification.lastTotals,
+      row,
+      variant: "drawer",
+      onClose: () => undefined,
+    }),
+  )
+  assert.match(html, /^<aside id="factory-row-editor" aria-labelledby="factory-row-editor-title"/)
+  assert.match(html, /aria-label="Close row editor"/)
+  assert.doesNotMatch(html, /Back to factory/)
+  assert.match(html, /role="group" aria-label="Machine for Advanced circuit"/)
+})
+
+test("compact targets screen and sheet expose every target control", () => {
+  const screenHtml = renderToStaticMarkup(
+    createElement(TargetsScreen, { commands, snapshot: snapshot(), onClose: () => undefined }),
+  )
+  assert.match(screenHtml, /^<dialog aria-labelledby="targets-screen-title"/)
+  assert.match(screenHtml, /<h2 id="targets-screen-title"[^>]*>Production targets<\/h2>/)
+  assert.match(screenHtml, />\+ Add target<\/button>/)
+  assert.match(screenHtml, /aria-label="Edit target 1: Advanced circuit"/)
+  assert.match(screenHtml, /aria-label="Production locations"/)
+  assert.match(screenHtml, /Tap to add or remove a location\./)
+  assert.doesNotMatch(screenHtml, /Shift-click/)
+  assert.match(screenHtml, /aria-label="Apply preset"/)
+
+  const sheetHtml = renderToStaticMarkup(
+    createElement(TargetSheet, { snapshot: snapshot(), target, onClose: () => undefined }),
+  )
+  assert.match(sheetHtml, /^<dialog aria-labelledby="target-sheet-title"/)
+  assert.match(sheetHtml, /aria-label="Remove Advanced circuit target"/)
+  assert.match(sheetHtml, /aria-label="Search target outputs"/)
+  assert.doesNotMatch(sheetHtml, /Select [^"]+ as output/)
+  assert.match(sheetHtml, /role="group" aria-label="Specify by"/)
+  assert.match(sheetHtml, /aria-pressed="true"[^>]*>Rate<\/button>/)
+  assert.match(sheetHtml, />Machines<\/button>/)
+  assert.match(sheetHtml, />Belts<\/button>/)
+  assert.match(sheetHtml, /aria-label="Rate for Advanced circuit"/)
+  assert.match(sheetHtml, /aria-label="Decrease"/)
+  assert.match(sheetHtml, /aria-label="Increase"/)
+  assert.match(sheetHtml, /aria-label="Quality for Advanced circuit"/)
+  assert.match(sheetHtml, />Done<\/button>/)
 })
 
 test("factory rows keep lava-melting machines with their primary products", () => {

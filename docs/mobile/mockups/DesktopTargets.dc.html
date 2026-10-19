@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Desktop targets drawer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#e8a04a}a:hover{color:#f3b86b}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 1040px; box-sizing: border-box; display: flex; flex-direction: column; background: #1b1b1b; color: #e8e4dc; font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif; font-size: 14px">
+
+  <header style="display: flex; align-items: center; flex-wrap: wrap; gap: 16px 24px; padding: 10px 24px; border-bottom: 1px solid #333; background: #202020">
+    <h1 style="margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.01em; white-space: nowrap">Factorio Calculator</h1>
+    <nav aria-label="Calculator sections" style="display: flex; flex-wrap: wrap; gap: 4px; flex-grow: 1">
+      <a href="DesktopFactory.dc.html" aria-current="page" style="min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: #2e2a22; color: #e8a04a; text-decoration: none; font-size: 14px; font-weight: 500">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l6 4V8l6 4V5l6 3v13z"></path></svg>
+        Factory
+      </a>
+      <a href="DesktopFactory.dc.html" style="min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; color: #a8a399; text-decoration: none; font-size: 14px; font-weight: 500">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"></circle><circle cx="19" cy="6" r="2"></circle><circle cx="12" cy="18" r="2"></circle><path d="M7 7l4 9M17 7l-4 9"></path></svg>
+        Visualize
+      </a>
+      <a href="DesktopFactory.dc.html" style="min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; color: #a8a399; text-decoration: none; font-size: 14px; font-weight: 500">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path></svg>
+        Resources
+      </a>
+      <a href="DesktopFactory.dc.html" style="min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; color: #a8a399; text-decoration: none; font-size: 14px; font-weight: 500">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+        Settings
+      </a>
+      <a href="DesktopFactory.dc.html" style="min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; color: #a8a399; text-decoration: none; font-size: 14px; font-weight: 500">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7M12 17h.01"></path></svg>
+        Help
+      </a>
+    </nav>
+    <div role="group" aria-label="Row density" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 10px; background: #1b1b1b">
+      <button type="button" aria-pressed="false" style="height: 34px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #e8e4dc; font-size: 13px; font-weight: 500; font-family: inherit">Relaxed</button>
+      <button type="button" aria-pressed="true" style="height: 34px; padding: 0 12px; border: 0; border-radius: 8px; background: #e8a04a; color: #1b1b1b; font-size: 13px; font-weight: 600; font-family: inherit">Compact</button>
+    </div>
+    <button type="button" style="min-height: 40px; padding: 0 14px; border: 1px solid #3a3a3a; border-radius: 10px; background: #262626; color: #e8a04a; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 8px; font-family: inherit">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"></path></svg>
+      Copy plan link
+    </button>
+  </header>
+
+  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 16px 40px; padding: 12px 24px; border-bottom: 1px solid #333; background: #202020">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Power</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500">15.5 MW</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Machines</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500">100</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Rate</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500">per min</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Belt</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500">Yellow</span>
+    </div>
+    <div style="flex-grow: 1"></div>
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="width: 32px; height: 32px; border-radius: 7px; background: #4f8f5a; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #0f1a10">EC</div>
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Targets</span>
+        <span style="font-weight: 500">Electronic circuit · <span style="font-family: 'IBM Plex Mono', monospace">600</span>/min <span style="color: #a8a399">· +1 more</span></span>
+      </div>
+      <a href="DesktopTargets.dc.html" aria-current="true" style="min-height: 40px; display: flex; align-items: center; padding: 0 14px; border: 1px solid #e8a04a; border-radius: 10px; background: #2e2a22; color: #e8a04a; font-weight: 500; text-decoration: none; font-size: 14px">Edit targets</a>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; flex-grow: 1; align-items: stretch">
+
+    <main style="flex: 1 1 640px; min-width: 0; padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 12px">
+      <div style="border: 1px solid #3a3a3a; border-radius: 12px; background: #262626; overflow-x: auto">
+        <table style="width: 100%; min-width: 860px; border-collapse: collapse">
+          <thead>
+            <tr>
+              <th scope="col" style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Item</th>
+              <th scope="col" style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Rate /min</th>
+              <th scope="col" style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Belts</th>
+              <th scope="col" style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Machines</th>
+              <th scope="col" style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Modules</th>
+              <th scope="col" style="text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Beacons</th>
+              <th scope="col" style="text-align: right; padding: 10px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399; border-bottom: 1px solid #333; white-space: nowrap">Power</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333">
+                <button type="button" aria-expanded="false" style="display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #4f8f5a; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #0f1a10; flex-shrink: 0">EC</span>
+                  <span style="display: flex; flex-direction: column">
+                    <span style="font-weight: 500; display: flex; align-items: center; gap: 8px">Electronic circuit <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #e8a04a; padding: 1px 6px; border: 1px solid #e8a04a; border-radius: 999px">Target</span></span>
+                    <span style="font-size: 12px; color: #a8a399">Assembling machine 3</span>
+                  </span>
+                </button>
+              </td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500">600</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">0.67</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333"><span style="display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: #1b1b1b; font-size: 13px; font-family: 'IBM Plex Mono', monospace">4 × AM3</span></td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333"><span style="display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: #1b1b1b; font-size: 13px; color: #d7d2c8">Prod 3 ×4</span></td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333"><span style="display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: #1b1b1b; font-size: 13px; color: #d7d2c8">2 · Speed 3</span></td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">1.5 MW</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333">
+                <button type="button" aria-expanded="false" style="display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #5d6f8f; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #0e1218; flex-shrink: 0">AC</span>
+                  <span style="display: flex; flex-direction: column">
+                    <span style="font-weight: 500; display: flex; align-items: center; gap: 8px">Advanced circuit <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #e8a04a; padding: 1px 6px; border: 1px solid #e8a04a; border-radius: 999px">Target</span></span>
+                    <span style="font-size: 12px; color: #a8a399">Assembling machine 3</span>
+                  </span>
+                </button>
+              </td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500">80</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">0.09</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333"><span style="display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: #1b1b1b; font-size: 13px; font-family: 'IBM Plex Mono', monospace">8 × AM3</span></td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; color: #a8a399">—</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; color: #a8a399">—</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">3.0 MW</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333">
+                <button type="button" aria-expanded="false" style="display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #c87a3e; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #1a0e05; flex-shrink: 0">CC</span>
+                  <span style="display: flex; flex-direction: column">
+                    <span style="font-weight: 500">Copper cable</span>
+                    <span style="font-size: 12px; color: #a8a399">Assembling machine 3</span>
+                  </span>
+                </button>
+              </td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500">2,120</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">2.36</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333"><span style="display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: #1b1b1b; font-size: 13px; font-family: 'IBM Plex Mono', monospace">7 × AM3</span></td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; color: #a8a399">—</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; color: #a8a399">—</td>
+              <td style="padding: 6px 16px; border-bottom: 1px solid #333; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">2.7 MW</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 16px">
+                <button type="button" aria-expanded="false" style="display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #8a97a8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #101418; flex-shrink: 0">IP</span>
+                  <span style="display: flex; flex-direction: column">
+                    <span style="font-weight: 500">Iron plate</span>
+                    <span style="font-size: 12px; color: #a8a399">Electric furnace</span>
+                  </span>
+                </button>
+              </td>
+              <td style="padding: 6px 16px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500">600</td>
+              <td style="padding: 6px 16px; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">0.67</td>
+              <td style="padding: 6px 16px"><span style="display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: #1b1b1b; font-size: 13px; font-family: 'IBM Plex Mono', monospace">16 × furnace</span></td>
+              <td style="padding: 6px 16px; color: #a8a399">—</td>
+              <td style="padding: 6px 16px; color: #a8a399">—</td>
+              <td style="padding: 6px 16px; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #d7d2c8">2.9 MW</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin: 0; color: #a8a399; font-size: 13px">Remaining rows continue below; the table stays live while targets are edited in the drawer.</p>
+    </main>
+
+    <aside aria-label="Targets" style="flex: 0 1 440px; min-width: 320px; border-left: 1px solid #333; background: #202020; display: flex; flex-direction: column">
+
+      <header style="display: flex; align-items: center; gap: 8px; padding: 12px 12px 12px 16px; border-bottom: 1px solid #333">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; flex-grow: 1">Targets</h2>
+        <button type="button" style="min-height: 40px; padding: 0 14px; border: 1px solid #3a3a3a; border-radius: 10px; background: #262626; color: #e8a04a; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 6px; font-family: inherit; cursor: pointer">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+          Add
+        </button>
+        <a href="DesktopFactory.dc.html" aria-label="Close targets" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; color: #e8e4dc">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </a>
+      </header>
+
+      <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #333">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Locations</span>
+          <div role="group" aria-label="Locations" style="display: flex; gap: 8px; flex-wrap: wrap">
+            <button type="button" aria-pressed="true" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #e8a04a; background: #2e2a22; color: #e8e4dc; font-size: 13px; font-family: inherit; cursor: pointer">Nauvis</button>
+            <button type="button" aria-pressed="false" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #3a3a3a; background: #262626; color: #e8e4dc; font-size: 13px; font-family: inherit; cursor: pointer">Vulcanus</button>
+            <button type="button" aria-pressed="false" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #3a3a3a; background: #262626; color: #e8e4dc; font-size: 13px; font-family: inherit; cursor: pointer">Fulgora</button>
+            <button type="button" aria-pressed="false" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #3a3a3a; background: #262626; color: #e8e4dc; font-size: 13px; font-family: inherit; cursor: pointer">Gleba</button>
+            <button type="button" aria-pressed="false" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #3a3a3a; background: #262626; color: #e8e4dc; font-size: 13px; font-family: inherit; cursor: pointer">Aquilo</button>
+          </div>
+        </div>
+        <label style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Preset</span>
+          <select style="height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #3a3a3a; background: #262626; color: #e8e4dc; font-size: 14px; font-family: inherit; min-width: 220px">
+            <option>Custom</option><option>Early game</option><option>Mid game</option><option>Late game</option><option>Legendary quality</option>
+          </select>
+        </label>
+      </div>
+
+      <ul style="list-style: none; margin: 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px">
+        <li>
+          <button type="button" aria-pressed="true" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: #262626; border: 1px solid #e8a04a; color: #e8e4dc; text-align: left; font: inherit; cursor: pointer">
+            <span style="width: 36px; height: 36px; border-radius: 8px; background: #4f8f5a; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #0f1a10; flex-shrink: 0">EC</span>
+            <span style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+              <span style="font-weight: 500">Electronic circuit</span>
+              <span style="font-size: 13px; color: #a8a399">Normal quality</span>
+            </span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 500">600<span style="font-size: 12px; color: #a8a399; font-family: 'IBM Plex Sans', sans-serif">/min</span></span>
+          </button>
+        </li>
+        <li>
+          <button type="button" aria-pressed="false" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: #262626; border: 1px solid #3a3a3a; color: #e8e4dc; text-align: left; font: inherit; cursor: pointer">
+            <span style="width: 36px; height: 36px; border-radius: 8px; background: #5d6f8f; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #0e1218; flex-shrink: 0">AC</span>
+            <span style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+              <span style="font-weight: 500">Advanced circuit</span>
+              <span style="font-size: 13px; color: #a8a399">Normal quality</span>
+            </span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 500">8<span style="font-size: 12px; color: #a8a399; font-family: 'IBM Plex Sans', sans-serif"> mach.</span></span>
+          </button>
+        </li>
+      </ul>
+
+      <section aria-label="Edit target" style="margin: 4px 16px 16px; display: flex; flex-direction: column; gap: 14px; padding: 14px 16px 16px; background: #262626; border: 1px solid #3a3a3a; border-radius: 14px">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <h3 style="margin: 0; font-size: 15px; font-weight: 600">Edit target</h3>
+          <button type="button" aria-label="Remove target" style="min-height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: #e07b6a; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer">Remove</button>
+        </div>
+
+        <label style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Item</span>
+          <input type="search" value="electronic" aria-label="Search items" style="box-sizing: border-box; width: 100%; height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #3a3a3a; background: #1b1b1b; color: #e8e4dc; font-size: 15px; font-family: inherit">
+        </label>
+
+        <div role="group" aria-label="Matching items" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px">
+          <button type="button" aria-label="Electronic circuit" aria-pressed="true" style="height: 52px; border-radius: 10px; border: 2px solid #e8a04a; background: #4f8f5a; color: #0f1a10; font-size: 12px; font-weight: 600; padding: 0; font-family: inherit; cursor: pointer">EC</button>
+          <button type="button" aria-label="Advanced circuit" aria-pressed="false" style="height: 52px; border-radius: 10px; border: 2px solid transparent; background: #5d6f8f; color: #0e1218; font-size: 12px; font-weight: 600; padding: 0; font-family: inherit; cursor: pointer">AC</button>
+          <button type="button" aria-label="Processing unit" aria-pressed="false" style="height: 52px; border-radius: 10px; border: 2px solid transparent; background: #7a6aa8; color: #120e1c; font-size: 12px; font-weight: 600; padding: 0; font-family: inherit; cursor: pointer">PU</button>
+          <button type="button" aria-label="Electric engine unit" aria-pressed="false" style="height: 52px; border-radius: 10px; border: 2px solid transparent; background: #8a97a8; color: #101418; font-size: 12px; font-weight: 600; padding: 0; font-family: inherit; cursor: pointer">EE</button>
+          <button type="button" aria-label="Electric furnace" aria-pressed="false" style="height: 52px; border-radius: 10px; border: 2px solid transparent; background: #9a8f7a; color: #1a1610; font-size: 12px; font-weight: 600; padding: 0; font-family: inherit; cursor: pointer">EF</button>
+          <button type="button" aria-label="Electric mining drill" aria-pressed="false" style="height: 52px; border-radius: 10px; border: 2px solid transparent; background: #7d8794; color: #101418; font-size: 12px; font-weight: 600; padding: 0; font-family: inherit; cursor: pointer">EM</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Specify by</span>
+          <div role="group" aria-label="Specify by" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: #1b1b1b">
+            <button type="button" aria-pressed="true" style="height: 40px; border: 0; border-radius: 9px; background: #e8a04a; color: #1b1b1b; font-weight: 600; font-size: 14px; font-family: inherit; cursor: pointer">Rate</button>
+            <button type="button" aria-pressed="false" style="height: 40px; border: 0; border-radius: 9px; background: transparent; color: #e8e4dc; font-weight: 500; font-size: 14px; font-family: inherit; cursor: pointer">Machines</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <label style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Items per minute</span>
+            <div style="display: flex; align-items: center; border-radius: 12px; border: 1px solid #3a3a3a; background: #1b1b1b; overflow: hidden">
+              <button type="button" aria-label="Decrease" style="width: 40px; height: 44px; border: 0; background: transparent; color: #e8e4dc; font-size: 20px; cursor: pointer">−</button>
+              <input type="text" inputmode="decimal" value="600" aria-label="Rate" style="flex-grow: 1; min-width: 0; height: 44px; border: 0; background: transparent; color: #e8e4dc; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 500">
+              <button type="button" aria-label="Increase" style="width: 40px; height: 44px; border: 0; background: transparent; color: #e8e4dc; font-size: 20px; cursor: pointer">+</button>
+            </div>
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a399">Quality</span>
+            <select aria-label="Quality" style="height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #3a3a3a; background: #1b1b1b; color: #e8e4dc; font-size: 14px; font-family: inherit">
+              <option>Normal</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option>
+            </select>
+          </label>
+        </div>
+
+        <label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 12px; background: #1b1b1b">
+          <span style="color: #a8a399; font-size: 13px">Belts (yellow)</span>
+          <input type="text" inputmode="decimal" value="0.67" aria-label="Belts" style="width: 90px; height: 36px; border-radius: 8px; border: 1px solid #3a3a3a; background: #262626; color: #e8e4dc; text-align: right; padding: 0 10px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500">
+        </label>
+
+        <a href="DesktopFactory.dc.html" style="height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #e8a04a; color: #1b1b1b; font-weight: 600; font-size: 15px; text-decoration: none">Done</a>
+      </section>
+
+    </aside>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

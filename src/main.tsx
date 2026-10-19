@@ -26,6 +26,8 @@ a { color: var(--accent); text-decoration: underline; text-underline-offset: 0.1
 summary { list-style-position: outside; }
 [data-density="compact"] { --cell-padding: 1.5px 5px; --panel-padding: 6px; --layout-gap: 5px; }
 [data-density="comfortable"] { --cell-padding: 7px 6px; --panel-padding: 10px; --layout-gap: 9px; }
+.calculator-app { --control-height: 36px; }
+@media (pointer: coarse) { .calculator-app { --control-height: 44px; } }
 .target-header, .target-grid { grid-template-columns: 32px 220px 110px 72px 88px 88px; }
 .target-grid > label > span:first-child, .target-output > span:first-child { display: none; }
 .planner-toolbar > label > span { font-size: 11.52px !important; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -65,36 +67,6 @@ summary { list-style-position: outside; }
 }
 @media (max-width: 760px) {
   .calculator-app { padding: 0.6rem !important; }
-  .target-header { display: none !important; }
-  .target-grid { grid-template-columns: 32px minmax(0, calc(100% - 44.8px)) !important; align-items: start !important; width: 100% !important; margin-top: 5.7px !important; }
-  .target-grid > label > span:first-child { display: block; }
-  .target-output > span:first-child { display: none !important; }
-  .target-output { grid-column: 2; width: calc(100% - 3.2px) !important; }
-  .target-item-picker-panel { left: -40px !important; width: calc(100vw - 20px) !important; }
-  .target-quality { grid-column: 2; max-width: 192px; }
-  .target-machines { grid-column: 2; width: calc(50% - 4px); }
-  .target-rate { grid-column: 2; width: calc(50% - 4px); margin-left: calc(50% + 4px); margin-top: -53px; }
-  .target-belts { grid-column: 2; max-width: 135px; margin-top: -11px; }
-  .target-warning { grid-column: 1 / -1 !important; margin-left: 40px; }
-  .planner-toolbar { display: grid !important; justify-items: start; gap: 10.5px !important; }
-  .planner-toolbar > label { display: grid !important; grid-template-columns: auto 158px; align-items: center; gap: 8px; width: max-content !important; padding-left: 0 !important; border-left: 0 !important; }
-  .planner-toolbar > label select { width: 158px !important; }
-  .location-selector { grid-template-columns: minmax(0, 1fr) !important; }
-  .location-selector > * { grid-column: 1 !important; grid-row: auto !important; }
-  .planner-actions { margin-left: 0 !important; }
-  .tabs { flex-wrap: nowrap !important; gap: 13.6px !important; width: max-content; min-width: 100%; }
-  .factory-summary { align-items: flex-start !important; flex-direction: column; gap: 3px !important; }
-  .factory-summary-card { width: auto; }
-  .factory-table .factory-surplus { display: none; }
-  .factory-table th:first-child, .factory-table td:first-child,
-  .factory-table th:nth-child(2), .factory-table td:nth-child(2) { position: sticky; z-index: 2; background: var(--card); }
-  .factory-table th:first-child, .factory-table td:first-child { left: 0; }
-  .factory-table th:nth-child(2), .factory-table td:nth-child(2) { left: 25px; }
-  .factory-table { font-size: 13px !important; }
-  .factory-table th:nth-child(2) { width: 165px !important; }
-  .factory-table th:nth-child(3) { width: 80px !important; }
-  .factory-table th:nth-child(4) { width: 105px !important; }
-  .factory-table .item-name { max-width: none; }
   .settings-row { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
   .settings-columns { grid-template-columns: minmax(0, 1fr) !important; }
   .changelog-entry { grid-template-columns: minmax(0, 1fr) !important; gap: 5px !important; }
@@ -12227,7 +12199,7 @@ const UI = {
   },
   control: {
     width: "100%",
-    minHeight: 36,
+    minHeight: "var(--control-height)",
     padding: "6px 10px",
     color: "var(--text)",
     border: "1px solid var(--border)",
@@ -12235,7 +12207,7 @@ const UI = {
     background: "var(--card)",
   },
   button: {
-    minHeight: 36,
+    minHeight: "var(--control-height)",
     padding: "6px 12px",
     color: "var(--text)",
     border: "1px solid var(--border)",
@@ -12245,7 +12217,7 @@ const UI = {
     cursor: "pointer",
   },
   primaryButton: {
-    minHeight: 36,
+    minHeight: "var(--control-height)",
     padding: "6px 14px",
     color: "var(--on-accent)",
     border: "1px solid var(--accent)",
@@ -12256,7 +12228,7 @@ const UI = {
   },
   dangerButton: {
     width: 32,
-    minHeight: 36,
+    minHeight: "var(--control-height)",
     padding: 0,
     color: "var(--danger)",
     border: "1px solid var(--border)",
@@ -12291,6 +12263,162 @@ const UI = {
   activeTab: {
     color: "var(--accent)",
     background: "var(--accent-soft)",
+  },
+  compactHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    minHeight: 44,
+    marginBottom: 8,
+  },
+  compactTitle: { flex: 1, margin: 0, color: "var(--bright)", fontSize: 20, fontWeight: 600 },
+  bottomTabs: {
+    position: "fixed",
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 20,
+    display: "grid",
+    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+    paddingBottom: "env(safe-area-inset-bottom)",
+    borderTop: "1px solid var(--divider)",
+    background: "var(--surface)",
+  },
+  factoryCard: {
+    display: "grid",
+    gap: 8,
+    width: "100%",
+    padding: "10px 12px",
+    color: "var(--text)",
+    border: "1px solid var(--border)",
+    borderRadius: 12,
+    background: "var(--card)",
+    textAlign: "left",
+    cursor: "pointer",
+  },
+  cardChip: {
+    padding: "2px 8px",
+    color: "var(--text-soft)",
+    border: "1px solid var(--border)",
+    borderRadius: 999,
+    background: "var(--bg)",
+    fontSize: 12,
+  },
+  fullScreenDialog: {
+    width: "100%",
+    maxWidth: "100%",
+    height: "100%",
+    maxHeight: "100%",
+    margin: 0,
+    padding: "0 12px",
+    color: "var(--text)",
+    border: 0,
+    background: "var(--bg)",
+  },
+  iconButton: {
+    display: "grid",
+    placeItems: "center",
+    minWidth: 44,
+    minHeight: 44,
+    padding: 0,
+    color: "var(--text)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    background: "var(--card)",
+    fontSize: 20,
+    cursor: "pointer",
+  },
+  bottomSheet: {
+    width: "100%",
+    maxWidth: "100%",
+    maxHeight: "92%",
+    margin: "auto 0 0",
+    padding: "16px 14px calc(16px + env(safe-area-inset-bottom))",
+    color: "var(--text)",
+    border: 0,
+    borderTop: "2px solid var(--accent)",
+    borderRadius: "16px 16px 0 0",
+    background: "var(--surface)",
+  },
+  drawerLayout: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 380px)",
+    gap: 12,
+    alignItems: "start",
+  },
+  rowDrawer: {
+    position: "sticky",
+    top: 8,
+    maxHeight: "calc(100vh - 16px)",
+    overflowY: "auto",
+    padding: "0 14px 14px",
+    border: "1px solid var(--border)",
+    borderTop: "2px solid var(--accent)",
+    borderRadius: 12,
+    background: "var(--surface)",
+  },
+  dialogHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    minHeight: 44,
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
+    padding: "calc(8px + env(safe-area-inset-top)) 0 8px",
+    background: "var(--bg)",
+  },
+  editorSection: { display: "grid", gap: 8, padding: "12px 0", borderTop: "1px solid var(--divider)" },
+  editorHeading: {
+    margin: 0,
+    color: "var(--muted)",
+    fontSize: 12,
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+  },
+  choiceButton: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    width: "100%",
+    minHeight: 48,
+    padding: "4px 10px",
+    color: "var(--text)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    background: "var(--card)",
+    textAlign: "left",
+    cursor: "pointer",
+  },
+  choiceButtonSelected: { border: "1px solid var(--accent)", background: "var(--accent-soft)" },
+  slotButton: {
+    display: "grid",
+    placeItems: "center",
+    width: 44,
+    height: 44,
+    padding: 2,
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    background: "var(--card)",
+    cursor: "pointer",
+  },
+  slotButtonSelected: { border: "1px solid var(--accent)", background: "var(--accent-soft)" },
+  statList: { display: "grid", gap: 6, margin: 0 },
+  statRow: { display: "flex", justifyContent: "space-between", gap: 12 },
+  statValue: { margin: 0, fontFamily: "var(--font-mono)" },
+  bottomTab: {
+    display: "grid",
+    justifyItems: "center",
+    gap: 2,
+    minHeight: 56,
+    padding: "6px 2px",
+    color: "var(--muted)",
+    border: 0,
+    background: "transparent",
+    fontSize: 11,
+    fontWeight: 500,
+    cursor: "pointer",
   },
   summary: {
     display: "grid",
@@ -12752,9 +12880,46 @@ interface CalculatorViewProps {
   readonly commands: CalculatorCommands
 }
 
-function LocationSelector({ specification }: { readonly specification: FactorySpecification }) {
+// Compact (touch) mode toggles locations on tap, because phones have no Shift-click.
+function LocationSelector({
+  specification,
+  compact = false,
+}: {
+  readonly specification: FactorySpecification
+  readonly compact?: boolean
+}) {
   if (specification.planets === null || specification.planets.size <= 1) return null
   const locations = [...specification.planets.values()].sort((a, b) => a.order.localeCompare(b.order))
+  if (compact) {
+    return (
+      <div aria-label="Production locations" style={{ display: "grid", gap: 6 }}>
+        <div style={{ ...UI.row, gap: 6 }}>
+          {locations.map((location) => {
+            const selected = specification.selectedPlanets.has(location)
+            return (
+              <button
+                key={location.key}
+                type="button"
+                aria-pressed={selected}
+                disabled={selected && specification.selectedPlanets.size === 1}
+                style={mergeStyles(UI.button, { padding: "4px 10px" }, selected && UI.choiceButtonSelected)}
+                onClick={() =>
+                  runMutation(specification, () => {
+                    if (selected) specification.unselectPlanet(location)
+                    else specification.selectPlanet(location)
+                    for (const target of specification.buildTargets) target.refreshRecipes()
+                  })
+                }
+              >
+                <IconLabel icon={location.icon} name={location.name} size={24} />
+              </button>
+            )
+          })}
+        </div>
+        <span style={UI.muted}>Tap to add or remove a location.</span>
+      </div>
+    )
+  }
   return (
     <div
       className="location-selector"
@@ -12824,6 +12989,87 @@ function LocationSelector({ specification }: { readonly specification: FactorySp
   )
 }
 
+function filterTargetItems(specification: FactorySpecification, search: string): Item[][][] {
+  return specification.itemGroups
+    .map((group) =>
+      group
+        .map((subgroup) => subgroup.filter((item) => item.phase !== "abstract" && itemMatchesSearch(item, search)))
+        .filter((subgroup) => subgroup.length > 0),
+    )
+    .filter((group) => group.length > 0)
+}
+
+function TargetItemGrid({
+  groupedItems,
+  selected,
+  onChoose,
+  maxHeight,
+}: {
+  readonly groupedItems: readonly (readonly (readonly Item[])[])[]
+  readonly selected: Item
+  readonly onChoose: (item: Item) => void
+  readonly maxHeight?: number
+}) {
+  return (
+    <div
+      style={{
+        minHeight: 0,
+        maxHeight,
+        overflowY: "auto",
+        scrollbarGutter: "stable",
+      }}
+    >
+      {groupedItems.map((group, groupIndex) => (
+        <div key={groupIndex} style={groupIndex === 0 ? undefined : { marginTop: 3 }}>
+          {group.map((subgroup, subgroupIndex) => (
+            <div
+              key={subgroupIndex}
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2,
+                minHeight: 34,
+              }}
+            >
+              {subgroup.map((item) => {
+                const chosen = item === selected
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    aria-label={`Select ${item.name} as output`}
+                    aria-pressed={chosen}
+                    title={item.name}
+                    style={{
+                      display: "grid",
+                      placeItems: "center",
+                      width: 32,
+                      height: 32,
+                      padding: 0,
+                      border: `1px solid ${chosen ? "var(--accent)" : "transparent"}`,
+                      borderRadius: 8,
+                      background: chosen ? "var(--light)" : "transparent",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => onChoose(item)}
+                  >
+                    <SpriteIcon icon={item.icon} size={32} title={item.name} />
+                  </button>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      ))}
+      {groupedItems.length === 0 ? (
+        <div role="status" style={{ ...UI.muted, padding: "8px 3px" }}>
+          No items match your search.
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 function TargetItemPicker({
   specification,
   target,
@@ -12843,15 +13089,7 @@ function TargetItemPicker({
     setSearch("")
     if (restoreFocus) requestAnimationFrame(() => trigger.current?.focus())
   }
-  const groupedItems = open
-    ? specification.itemGroups
-        .map((group) =>
-          group
-            .map((subgroup) => subgroup.filter((item) => item.phase !== "abstract" && itemMatchesSearch(item, search)))
-            .filter((subgroup) => subgroup.length > 0),
-        )
-        .filter((group) => group.length > 0)
-    : []
+  const groupedItems = open ? filterTargetItems(specification, search) : []
   const matchingItems = groupedItems.flat(2)
   const choose = (item: Item) => {
     close()
@@ -12960,61 +13198,7 @@ function TargetItemPicker({
               }
             }}
           />
-          <div
-            style={{
-              minHeight: 0,
-              overflowY: "auto",
-              scrollbarGutter: "stable",
-            }}
-          >
-            {groupedItems.map((group, groupIndex) => (
-              <div key={groupIndex} style={groupIndex === 0 ? undefined : { marginTop: 3 }}>
-                {group.map((subgroup, subgroupIndex) => (
-                  <div
-                    key={subgroupIndex}
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 2,
-                      minHeight: 34,
-                    }}
-                  >
-                    {subgroup.map((item) => {
-                      const selected = item === target.item
-                      return (
-                        <button
-                          key={item.key}
-                          type="button"
-                          aria-label={`Select ${item.name} as output`}
-                          aria-pressed={selected}
-                          title={item.name}
-                          style={{
-                            display: "grid",
-                            placeItems: "center",
-                            width: 32,
-                            height: 32,
-                            padding: 0,
-                            border: `1px solid ${selected ? "var(--accent)" : "transparent"}`,
-                            borderRadius: 8,
-                            background: selected ? "var(--light)" : "transparent",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => choose(item)}
-                        >
-                          <SpriteIcon icon={item.icon} size={32} title={item.name} />
-                        </button>
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
-            ))}
-            {matchingItems.length === 0 ? (
-              <div role="status" style={{ ...UI.muted, padding: "8px 3px" }}>
-                No items match your search.
-              </div>
-            ) : null}
-          </div>
+          <TargetItemGrid groupedItems={groupedItems} selected={target.item} onChoose={choose} />
         </div>
       ) : null}
     </div>
@@ -13141,6 +13325,32 @@ function TargetRow({ target, snapshot }: { readonly target: BuildTarget; readonl
   )
 }
 
+function PresetSelect({ snapshot, commands, style }: CalculatorViewProps & { readonly style?: CSSProperties }) {
+  const specification = snapshot.specification
+  return (
+    <select
+      aria-label="Apply preset"
+      defaultValue=""
+      style={mergeStyles(UI.control, style)}
+      onChange={(event) => {
+        const value = event.currentTarget.value
+        if (isProgressionPreset(value)) commands.applyProgressionPreset(value)
+        else if (isQualityPreset(value)) commands.applyQualityPreset(value)
+        event.currentTarget.value = ""
+      }}
+    >
+      <option value="">Custom</option>
+      <option value="early">Early game</option>
+      <option value="pre-rocket">Pre-rocket</option>
+      <option value="first-planets">Early Space Age</option>
+      <option value="late-space-age">Late Space Age</option>
+      <option value="full-legendary" disabled={specification.getAvailableQualities().length < 5}>
+        Full Legendary
+      </option>
+    </select>
+  )
+}
+
 function TargetsPanel({ snapshot, commands }: CalculatorViewProps) {
   const specification = snapshot.specification
   return (
@@ -13204,31 +13414,11 @@ function TargetsPanel({ snapshot, commands }: CalculatorViewProps) {
             borderLeft: "1px solid var(--rule)",
           }}
         >
-          <select
-            aria-label="Apply preset"
-            defaultValue=""
-            style={{
-              ...UI.control,
-              width: 158,
-              minHeight: 30,
-              fontSize: 13.75,
-            }}
-            onChange={(event) => {
-              const value = event.currentTarget.value
-              if (isProgressionPreset(value)) commands.applyProgressionPreset(value)
-              else if (isQualityPreset(value)) commands.applyQualityPreset(value)
-              event.currentTarget.value = ""
-            }}
-          >
-            <option value="">Custom</option>
-            <option value="early">Early game</option>
-            <option value="pre-rocket">Pre-rocket</option>
-            <option value="first-planets">Early Space Age</option>
-            <option value="late-space-age">Late Space Age</option>
-            <option value="full-legendary" disabled={specification.getAvailableQualities().length < 5}>
-              Full Legendary
-            </option>
-          </select>
+          <PresetSelect
+            snapshot={snapshot}
+            commands={commands}
+            style={{ width: 158, minHeight: 30, fontSize: 13.75 }}
+          />
         </Field>
         <div className="planner-actions" style={{ ...UI.row, marginLeft: "auto" }}>
           <span role="status" aria-live="polite" style={UI.muted}>
@@ -13243,17 +13433,75 @@ function TargetsPanel({ snapshot, commands }: CalculatorViewProps) {
   )
 }
 
-function TabBar({ snapshot, commands }: CalculatorViewProps) {
-  const tabs: readonly [CalculatorTab, string][] = [
-    ["totals", "Factory"],
-    ["graph", "Visualize"],
-    ["resources", "Resources"],
-    ["settings", "Settings"],
-    ["help", "Help"],
-  ]
+const CALCULATOR_TABS: readonly (readonly [CalculatorTab, string])[] = [
+  ["totals", "Factory"],
+  ["graph", "Visualize"],
+  ["resources", "Resources"],
+  ["settings", "Settings"],
+  ["help", "Help"],
+]
+
+function TabIcon({ tab }: { readonly tab: CalculatorTab }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width={22}
+      height={22}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {tab === "totals" ? <path d="M3 21V8l6 4V8l6 4V5l6 3v13z" /> : null}
+      {tab === "graph" ? (
+        <Fragment>
+          <circle cx={5} cy={6} r={2} />
+          <circle cx={19} cy={6} r={2} />
+          <circle cx={12} cy={18} r={2} />
+          <path d="M7 7l4 9M17 7l-4 9" />
+        </Fragment>
+      ) : null}
+      {tab === "resources" ? <path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5" /> : null}
+      {tab === "settings" ? (
+        <Fragment>
+          <circle cx={12} cy={12} r={3} />
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" />
+        </Fragment>
+      ) : null}
+      {tab === "help" ? (
+        <Fragment>
+          <circle cx={12} cy={12} r={9} />
+          <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7M12 17h.01" />
+        </Fragment>
+      ) : null}
+    </svg>
+  )
+}
+
+function TabBar({ snapshot, commands, compact = false }: CalculatorViewProps & { readonly compact?: boolean }) {
+  if (compact) {
+    return (
+      <nav className="bottom-tabs" style={UI.bottomTabs} aria-label="Calculator sections">
+        {CALCULATOR_TABS.map(([tab, label]) => (
+          <button
+            key={tab}
+            type="button"
+            aria-current={snapshot.activeTab === tab ? "page" : undefined}
+            style={mergeStyles(UI.bottomTab, snapshot.activeTab === tab && { color: "var(--accent)" })}
+            onClick={() => commands.selectTab(tab)}
+          >
+            <TabIcon tab={tab} />
+            {label}
+          </button>
+        ))}
+      </nav>
+    )
+  }
   return (
     <nav className="tabs" style={UI.tabs} aria-label="Calculator sections">
-      {tabs.map(([tab, label]) => (
+      {CALCULATOR_TABS.map(([tab, label]) => (
         <button
           key={tab}
           type="button"
@@ -13333,38 +13581,56 @@ function SummaryCard({
 function FactorySummaryView({
   specification,
   totals,
+  compact = false,
 }: {
   readonly specification: FactorySpecification
   readonly totals: Totals
+  readonly compact?: boolean
 }) {
   const summary = getFactorySummary(specification, totals)
+  const cardStyle: CSSProperties = compact
+    ? { display: "grid", alignContent: "start" }
+    : { display: "inline-flex", alignItems: "baseline", gap: 7 }
   return (
     <section
-      className="factory-summary"
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "baseline",
-        gap: 28,
-        margin: "4px 0 10px",
-      }}
+      className={compact ? "factory-summary-compact" : "factory-summary"}
+      style={
+        compact
+          ? {
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "6px 12px",
+              margin: "4px 0 10px",
+              padding: "8px 12px",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+              background: "var(--card)",
+            }
+          : {
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "baseline",
+              gap: 28,
+              margin: "4px 0 10px",
+            }
+      }
       aria-label="Factory summary"
     >
-      <div className="factory-summary-card" style={{ display: "inline-flex", alignItems: "baseline", gap: 7 }}>
+      <div className="factory-summary-card" style={cardStyle}>
         <span style={UI.summaryValue}>{formatCanadianNumber(String(summary.recipeCount))}</span>
         <span style={UI.muted}>Active recipes</span>
       </div>
-      <div className="factory-summary-card" style={{ display: "inline-flex", alignItems: "baseline", gap: 7 }}>
+      <div className="factory-summary-card" style={cardStyle}>
         <span style={UI.summaryValue}>{specification.format.count(summary.placedMachines)}</span>
         <span style={UI.muted}>Machines to place</span>
       </div>
-      <div className="factory-summary-card" style={{ display: "inline-flex", alignItems: "baseline", gap: 7 }}>
+      <div className="factory-summary-card" style={cardStyle}>
         <span style={UI.summaryValue}>
           {formatPower(specification, summary.electricalPower.add(summary.planning.beaconPower))}
         </span>
         <span style={UI.muted}>Electric + beacon power</span>
       </div>
-      <div className="factory-summary-card" style={{ display: "inline-flex", alignItems: "baseline", gap: 7 }}>
+      <div className="factory-summary-card" style={cardStyle}>
         <span style={UI.summaryValue}>{specification.format.count(summary.planning.pollution)}</span>
         <span style={UI.muted}>Pollution / min</span>
       </div>
@@ -13372,7 +13638,7 @@ function FactorySummaryView({
         <div
           key={fuel.key}
           className="factory-summary-card"
-          style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+          style={compact ? cardStyle : { display: "inline-flex", alignItems: "center", gap: 6 }}
         >
           <span style={UI.summaryValue}>{specification.format.rate(rate)}</span>
           <span
@@ -13388,7 +13654,7 @@ function FactorySummaryView({
         </div>
       ))}
       {summary.importedItems.length > 0 ? (
-        <div style={{ ...UI.row, flexBasis: "100%" }}>
+        <div style={{ ...UI.row, flexBasis: "100%", gridColumn: "1 / -1" }}>
           <span style={UI.label}>Imported</span>
           {summary.importedItems.map((item) => (
             <span key={item.key} style={UI.chip}>
@@ -13792,24 +14058,30 @@ function ItemBreakdown({
   )
 }
 
-function ItemTable({
-  specification,
-  totals,
-  pipette,
-}: {
-  readonly specification: FactorySpecification
-  readonly totals: Totals
-  readonly pipette: ModulePipetteController
-}) {
-  const [expandedItems, setExpandedItems] = useState<ReadonlySet<string>>(() => new Set())
-  const [openEquipmentPicker, setOpenEquipmentPicker] = useState<string | null>(null)
-  const showLocations = specification.selectedPlanets.size > 1
+interface FactoryRow {
+  readonly key: string
+  readonly item: Item | null
+  readonly recipe: Recipe | null
+  readonly rate: Rational
+  readonly imported: boolean
+  readonly belts: Rational | null
+  readonly recipeRate: Rational
+  readonly building: Building | null
+  readonly machineQuality: Quality
+  readonly count: Rational
+  readonly moduleSpec: ModuleSpec | null
+  readonly power: { readonly fuel: string | null; readonly power: Rational } | null
+  readonly target: boolean
+}
+
+// Factory rows in production order, shared by the desktop table and the compact card list.
+export function getFactoryRows(specification: FactorySpecification, totals: Totals): FactoryRow[] {
   const items = new Map<Item, Rational>()
   for (const [solverItem, rate] of totals.items) if (solverItem instanceof Item) items.set(solverItem, rate)
   for (const [solverItem, rate] of totals.products)
     if (solverItem instanceof Item && !items.has(solverItem)) items.set(solverItem, rate)
   const recipeGroups = topoSort(getRecipeGroups(new Set([...totals.rates.keys()].filter(isFactoryRecipe).reverse())))
-  const rows: {
+  const groupedRows: {
     readonly key: string
     readonly item: Item | null
     readonly factoryRecipe: FactoryRecipe | null
@@ -13831,7 +14103,7 @@ function ItemTable({
           ? primaryProduct
           : null
       if (item !== null) claimedItems.add(item)
-      rows.push({
+      groupedRows.push({
         key: `${groupIndex}-${index}-${item?.key ?? factoryRecipe?.key ?? "row"}`,
         item,
         factoryRecipe,
@@ -13840,7 +14112,7 @@ function ItemTable({
     }
     for (const item of groupItems) {
       if (claimedItems.has(item)) continue
-      rows.push({
+      groupedRows.push({
         key: `${groupIndex}-${index}-${item.key}`,
         item,
         factoryRecipe: null,
@@ -13848,6 +14120,50 @@ function ItemTable({
       index++
     }
   })
+  return groupedRows.map(({ key, item, factoryRecipe }) => {
+    const recipe = factoryRecipe instanceof Recipe ? factoryRecipe : null
+    const rate = item === null ? zero : (items.get(item) ?? zero)
+    const recipeRate = recipe === null ? zero : (totals.rates.get(recipe) ?? zero)
+    const building = recipe === null ? null : specification.getBuilding(recipe)
+    return {
+      key,
+      item,
+      recipe,
+      rate,
+      imported: item !== null && specification.ignore.has(item),
+      belts:
+        item !== null && item.phase === "solid" && specification.belt !== null
+          ? specification.getBeltCount(item, rate)
+          : null,
+      recipeRate,
+      building,
+      machineQuality: recipe === null ? specification.getNormalQuality() : specification.getMachineQuality(recipe),
+      count: recipe === null || building === null ? zero : specification.getCount(recipe, recipeRate),
+      moduleSpec: recipe === null ? null : specification.getModuleSpec(recipe),
+      power: recipe === null ? null : specification.getPowerUsage(recipe, recipeRate),
+      target: item !== null && specification.buildTargets.some((candidate) => candidate.item === item),
+    }
+  })
+}
+
+function ItemTable({
+  specification,
+  totals,
+  rows,
+  pipette,
+  editingRow,
+  onEdit,
+}: {
+  readonly specification: FactorySpecification
+  readonly totals: Totals
+  readonly rows: readonly FactoryRow[]
+  readonly pipette: ModulePipetteController
+  readonly editingRow: string | null
+  readonly onEdit: (row: FactoryRow) => void
+}) {
+  const [expandedItems, setExpandedItems] = useState<ReadonlySet<string>>(() => new Set())
+  const [openEquipmentPicker, setOpenEquipmentPicker] = useState<string | null>(null)
+  const showLocations = specification.selectedPlanets.size > 1
 
   const toggleExpanded = (key: string) => {
     setExpandedItems((current) => {
@@ -13887,7 +14203,7 @@ function ItemTable({
 
   return (
     <div className="factory-table-scroll" style={UI.tableWrap}>
-      <table className="factory-table" style={{ ...UI.table, minWidth: showLocations ? 1088 : 936 }}>
+      <table className="factory-table" style={{ ...UI.table, minWidth: showLocations ? 1126 : 974 }}>
         <thead>
           <tr>
             <th style={{ ...UI.th, width: 24 }} />
@@ -13926,28 +14242,14 @@ function ItemTable({
             <th className="factory-power" style={{ ...UI.th, width: 152, textAlign: "right" }}>
               Power
             </th>
-            <th className="factory-action" style={{ ...UI.th, width: 46 }} />
+            <th className="factory-action" style={{ ...UI.th, width: 84 }} />
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => {
-            const item = row.item
-            const recipe = row.factoryRecipe instanceof Recipe ? row.factoryRecipe : null
-            const rate = item === null ? zero : (items.get(item) ?? zero)
-            const imported = item !== null && specification.ignore.has(item)
-            const belts =
-              item !== null && item.phase === "solid" && specification.belt !== null
-                ? specification.getBeltCount(item, rate)
-                : null
-            const recipeRate = recipe === null ? zero : (totals.rates.get(recipe) ?? zero)
-            const building = recipe === null ? null : specification.getBuilding(recipe)
-            const machineQuality =
-              recipe === null ? specification.getNormalQuality() : specification.getMachineQuality(recipe)
-            const count = recipe === null || building === null ? zero : specification.getCount(recipe, recipeRate)
-            const moduleSpec = recipe === null ? null : specification.getModuleSpec(recipe)
-            const power = recipe === null ? null : specification.getPowerUsage(recipe, recipeRate)
+            const { item, recipe, rate, imported, belts, building, machineQuality, count, moduleSpec, power, target } =
+              row
             const expanded = item !== null && expandedItems.has(item.key)
-            const target = item !== null && specification.buildTargets.some((candidate) => candidate.item === item)
             return (
               <Fragment key={row.key}>
                 <tr
@@ -14227,14 +14529,15 @@ function ItemTable({
                             )
                           })()}
                   </td>
-                  <td className="factory-action" style={{ ...UI.td, textAlign: "center" }}>
-                    {item === null ? null : (
-                      <a
-                        href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Add ${item.name} as a production target`}
-                        title={`Add ${item.name} as a production target`}
+                  <td className="factory-action" style={UI.td}>
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 2 }}>
+                      <button
+                        id={factoryRowTriggerId(factoryRowIdentity(row))}
+                        type="button"
+                        aria-label={`Edit ${item?.name ?? recipe?.name ?? "row"} in the row editor`}
+                        aria-expanded={editingRow === factoryRowIdentity(row)}
+                        aria-controls={editingRow === factoryRowIdentity(row) ? "factory-row-editor" : undefined}
+                        title="Edit row"
                         style={{
                           ...UI.button,
                           display: "grid",
@@ -14242,15 +14545,51 @@ function ItemTable({
                           minHeight: 28,
                           padding: "0 5px",
                           color: "var(--accent)",
-                          opacity: 0.45,
                           border: 0,
-                          background: "transparent",
-                          textDecoration: "none",
+                          background: editingRow === factoryRowIdentity(row) ? "var(--accent-soft)" : "transparent",
                         }}
+                        onClick={() => onEdit(row)}
                       >
-                        <UiGlyph name="popout" size={24} />
-                      </a>
-                    )}
+                        <svg
+                          aria-hidden="true"
+                          width={20}
+                          height={20}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                        >
+                          <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
+                          <circle cx={16} cy={6} r={2} />
+                          <circle cx={10} cy={12} r={2} />
+                          <circle cx={18} cy={18} r={2} />
+                        </svg>
+                      </button>
+                      {item === null ? null : (
+                        <a
+                          href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Add ${item.name} as a production target`}
+                          title={`Add ${item.name} as a production target`}
+                          style={{
+                            ...UI.button,
+                            display: "grid",
+                            placeItems: "center",
+                            minHeight: 28,
+                            padding: "0 5px",
+                            color: "var(--accent)",
+                            opacity: 0.45,
+                            border: 0,
+                            background: "transparent",
+                            textDecoration: "none",
+                          }}
+                        >
+                          <UiGlyph name="popout" size={24} />
+                        </a>
+                      )}
+                    </span>
                   </td>
                 </tr>
                 {expanded && item !== null ? (
@@ -15440,7 +15779,981 @@ function PlanningDetails({
   )
 }
 
-function FactoryPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
+// Escape pressed on an expanded trigger or inside a non-<dialog> role="dialog" panel belongs to that popover.
+function isNestedPopoverEscape(target: EventTarget | null): boolean {
+  return target instanceof Element && target.closest('[aria-expanded="true"], [role="dialog"]:not(dialog)') !== null
+}
+
+// Native modal dialog: focus trap, inert page, and Escape come from the browser. Escape that closes a nested
+// popover leaves the modal open.
+function ModalDialog({
+  labelledBy,
+  style,
+  onClose,
+  children,
+}: {
+  readonly labelledBy: string
+  readonly style: CSSProperties
+  readonly onClose: () => void
+  readonly children: ReactNode
+}) {
+  const dialog = useRef<HTMLDialogElement>(null)
+  const escapeClosesPopover = useRef(false)
+
+  useEffect(() => {
+    if (dialog.current?.open === false) dialog.current.showModal()
+  }, [])
+
+  return (
+    <dialog
+      ref={dialog}
+      aria-labelledby={labelledBy}
+      style={style}
+      onKeyDownCapture={(event) => {
+        if (event.key === "Escape") escapeClosesPopover.current = isNestedPopoverEscape(event.target)
+      }}
+      onCancel={(event) => {
+        if (escapeClosesPopover.current) event.preventDefault()
+        escapeClosesPopover.current = false
+      }}
+      onClose={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
+      {children}
+    </dialog>
+  )
+}
+
+function targetValueText(target: BuildTarget): string {
+  const format = target.specification.format
+  if (target.basis === "machines" && target.qualityLevel === 0) {
+    const machines = target.getDisplayedBuildings()
+    return `${machines} machine${machines === "1" ? "" : "s"}`
+  }
+  if (target.basis === "belts") {
+    const belts = target.getDisplayedBelts()
+    return `${belts} belt${belts === "1" ? "" : "s"}`
+  }
+  return `${target.getDisplayedRate()}/${format.rateName}`
+}
+
+function CompactTargetLine({
+  snapshot,
+  onOpenTargets,
+}: {
+  readonly snapshot: CalculatorSnapshot
+  readonly onOpenTargets: () => void
+}) {
+  const specification = snapshot.specification
+  const first = specification.buildTargets[0]
+  const more = specification.buildTargets.length - 1
+  return (
+    <div style={{ ...UI.row, flexWrap: "nowrap", gap: 10, margin: "0 0 10px" }}>
+      {first === undefined ? (
+        <span style={{ ...UI.muted, flex: 1 }}>No production targets</span>
+      ) : (
+        <Fragment>
+          <SpriteIcon
+            icon={first.item.icon}
+            size={32}
+            quality={specification.getAvailableQualities()[first.qualityLevel] ?? null}
+            title={first.item.name}
+          />
+          <span style={{ display: "grid", flex: 1, minWidth: 0 }}>
+            <span style={UI.label}>Target{more > 0 ? "s" : ""}</span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {first.item.name} · <span style={UI.number}>{targetValueText(first)}</span>
+              {more > 0 ? <span style={UI.muted}> +{more} more</span> : null}
+            </span>
+          </span>
+        </Fragment>
+      )}
+      <button type="button" style={UI.button} onClick={onOpenTargets}>
+        Edit targets
+      </button>
+    </div>
+  )
+}
+
+export function TargetsScreen({
+  snapshot,
+  commands,
+  onClose,
+}: CalculatorViewProps & {
+  readonly onClose: () => void
+}) {
+  const specification = snapshot.specification
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const editing = editingIndex === null ? null : (specification.buildTargets[editingIndex] ?? null)
+  const qualities = specification.getAvailableQualities()
+
+  return (
+    <ModalDialog labelledBy="targets-screen-title" style={UI.fullScreenDialog} onClose={onClose}>
+      <header style={UI.dialogHeader}>
+        <button type="button" aria-label="Back" style={UI.iconButton} onClick={onClose}>
+          <UiGlyph name="right" size={18} rotate={180} />
+        </button>
+        <h2 id="targets-screen-title" style={{ ...UI.compactTitle, fontSize: 18 }}>
+          Production targets
+        </h2>
+        <button
+          type="button"
+          style={UI.button}
+          disabled={snapshot.status === "loading"}
+          onClick={() => {
+            commands.addTarget()
+            setEditingIndex(specification.buildTargets.length - 1)
+          }}
+        >
+          + Add target
+        </button>
+      </header>
+
+      <ul aria-label="Targets" style={{ display: "grid", gap: 8, margin: "4px 0 0", padding: 0, listStyle: "none" }}>
+        {specification.buildTargets.map((target) => {
+          const quality = qualities[target.qualityLevel] ?? null
+          return (
+            <li key={`${target.index}-${target.item.key}`} style={{ display: "grid", gap: 6 }}>
+              <button
+                type="button"
+                aria-label={`Edit target ${target.index + 1}: ${target.item.name}`}
+                style={{ ...UI.factoryCard, display: "flex", alignItems: "center", gap: 10 }}
+                onClick={() => setEditingIndex(target.index)}
+              >
+                <SpriteIcon icon={target.item.icon} size={32} quality={quality} title={target.item.name} />
+                <span style={{ display: "grid", flex: 1, minWidth: 0 }}>
+                  <span style={{ color: "var(--bright)", fontWeight: 600 }}>{target.item.name}</span>
+                  {qualities.length > 1 ? <span style={UI.muted}>{quality?.name ?? "Normal"} quality</span> : null}
+                </span>
+                <span style={{ ...UI.number, whiteSpace: "nowrap" }}>{targetValueText(target)}</span>
+              </button>
+              {target.getAvailableRecipes().length === 0 && target.compatibleLocations.length > 0 ? (
+                <div role="alert" style={UI.callout}>
+                  <div>No selected location can produce {target.item.name}.</div>
+                  <button
+                    type="button"
+                    style={{ ...UI.button, marginTop: 7 }}
+                    onClick={() => runMutation(specification, () => target.enableCompatibleLocations())}
+                  >
+                    Enable {target.compatibleLocations.map((location) => location.name).join(" + ")}
+                  </button>
+                </div>
+              ) : null}
+            </li>
+          )
+        })}
+      </ul>
+
+      <section aria-labelledby="targets-screen-locations" style={{ ...UI.editorSection, marginTop: 12 }}>
+        <h3 id="targets-screen-locations" style={UI.editorHeading}>
+          Locations
+        </h3>
+        <LocationSelector specification={specification} compact />
+      </section>
+      <section
+        aria-labelledby="targets-screen-preset"
+        style={{ ...UI.editorSection, paddingBottom: "calc(12px + env(safe-area-inset-bottom))" }}
+      >
+        <h3 id="targets-screen-preset" style={UI.editorHeading}>
+          Preset
+        </h3>
+        <PresetSelect snapshot={snapshot} commands={commands} />
+      </section>
+
+      {editing === null ? null : (
+        <TargetSheet key={editing.index} snapshot={snapshot} target={editing} onClose={() => setEditingIndex(null)} />
+      )}
+    </ModalDialog>
+  )
+}
+
+type TargetInputMode = "rate" | "machines" | "belts"
+
+export function TargetSheet({
+  snapshot,
+  target,
+  onClose,
+}: {
+  readonly snapshot: CalculatorSnapshot
+  readonly target: BuildTarget
+  readonly onClose: () => void
+}) {
+  const specification = snapshot.specification
+  const [search, setSearch] = useState("")
+  const machinesDisabled = target.recipe === null || target.qualityLevel > 0
+  const [mode, setMode] = useState<TargetInputMode>(
+    target.basis === "machines" && machinesDisabled ? "rate" : target.basis,
+  )
+  const qualities = specification.getAvailableQualities()
+  const solid = target.item.phase === "solid"
+  const activeMode = (mode === "machines" && machinesDisabled) || (mode === "belts" && !solid) ? "rate" : mode
+  const name = target.item.name
+  const modes: readonly (readonly [TargetInputMode, string, boolean])[] = [
+    ["rate", "Rate", false],
+    ["machines", "Machines", machinesDisabled],
+    ...(solid ? [["belts", "Belts", false] as const] : []),
+  ]
+
+  const displayed =
+    activeMode === "rate"
+      ? target.getDisplayedRate()
+      : activeMode === "machines"
+        ? target.getDisplayedBuildings()
+        : target.getDisplayedBelts()
+  const exactValue = (): Rational => {
+    if (activeMode === "rate") return target.getRate().mul(specification.format.rateFactor)
+    if (activeMode === "belts") {
+      return target.basis === "belts"
+        ? target.belts
+        : specification.getBeltCount(target.item, target.getRate(), target.recipe ?? target.defaultRecipe)
+    }
+    if (target.basis === "machines") return target.buildings
+    const recipe = target.recipe
+    const perMachine = recipe === null ? null : specification.getRecipeRate(recipe)?.mul(recipe.gives(target.item))
+    return perMachine === null || perMachine === undefined || perMachine.isZero()
+      ? zero
+      : target.getRate().div(perMachine)
+  }
+  const commit = (value: string) =>
+    runMutation(specification, () => {
+      if (activeMode === "rate") target.setRate(value)
+      else if (activeMode === "machines") target.setBuildings(value, target.recipe)
+      else target.setBelts(value)
+    })
+  const step = (direction: 1 | -1) => {
+    const current = exactValue()
+    const next = direction === 1 ? current.floor().add(one) : current.ceil().sub(one)
+    commit(Rational.max(zero, next).toString())
+  }
+  const inputLabel =
+    activeMode === "rate"
+      ? `Rate for ${name}`
+      : activeMode === "machines"
+        ? `Machine count for ${name}`
+        : `Belt count for ${name}`
+  const visibleLabel =
+    activeMode === "rate"
+      ? `Items per ${specification.format.longRate}`
+      : activeMode === "machines"
+        ? "Machines"
+        : `Belts ${target.getBeltStackHeight()}`
+  const readout = [
+    activeMode === "rate" ? null : `${target.getDisplayedRate()}/${specification.format.rateName}`,
+    activeMode === "machines" || target.qualityLevel > 0 ? null : `${target.getDisplayedBuildings()} machines`,
+    activeMode === "belts" || !solid ? null : `${target.getDisplayedBelts()} belts ${target.getBeltStackHeight()}`,
+  ].filter((part) => part !== null)
+
+  return (
+    <ModalDialog labelledBy="target-sheet-title" style={UI.bottomSheet} onClose={onClose}>
+      <div style={{ ...UI.row, justifyContent: "space-between", marginBottom: 8 }}>
+        <h3 id="target-sheet-title" style={{ ...UI.compactTitle, fontSize: 18 }}>
+          Edit target {target.index + 1}
+        </h3>
+        <button
+          type="button"
+          aria-label={`Remove ${name} target`}
+          style={{ ...UI.button, color: "var(--danger)" }}
+          onClick={() => {
+            onClose()
+            runMutation(specification, () => specification.removeTarget(target))
+          }}
+        >
+          Remove
+        </button>
+      </div>
+
+      <div style={{ display: "grid", gap: 6 }}>
+        <span style={UI.label}>Item</span>
+        <IconLabel icon={target.item.icon} name={name} quality={qualities[target.qualityLevel] ?? null} size={32} />
+        <input
+          type="search"
+          aria-label="Search target outputs"
+          value={search}
+          placeholder="Search to change item"
+          style={UI.control}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+        />
+        {search.trim() === "" ? null : (
+          <TargetItemGrid
+            groupedItems={filterTargetItems(specification, search)}
+            selected={target.item}
+            maxHeight={176}
+            onChoose={(item) => {
+              setSearch("")
+              if (item !== target.item) runMutation(specification, () => target.setItem(item))
+            }}
+          />
+        )}
+      </div>
+
+      <div style={{ display: "grid", gap: 6, marginTop: 12 }}>
+        <span style={UI.label}>Specify by</span>
+        <div role="group" aria-label="Specify by" style={{ display: "flex", gap: 6 }}>
+          {modes.map(([value, label, disabled]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={activeMode === value}
+              disabled={disabled}
+              style={mergeStyles(UI.button, { flex: 1 }, activeMode === value && UI.choiceButtonSelected)}
+              onClick={() => setMode(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 12, marginTop: 12 }}>
+        <div style={UI.field}>
+          <span style={UI.label}>{visibleLabel}</span>
+          <span style={{ ...UI.row, flexWrap: "nowrap", gap: 4 }}>
+            <button type="button" aria-label="Decrease" style={UI.iconButton} onClick={() => step(-1)}>
+              −
+            </button>
+            <CommitInput
+              key={`${activeMode}-${snapshot.revision}-${displayed}`}
+              ariaLabel={inputLabel}
+              value={displayed}
+              style={{ minWidth: 0, textAlign: "center" }}
+              onCommit={commit}
+            />
+            <button type="button" aria-label="Increase" style={UI.iconButton} onClick={() => step(1)}>
+              +
+            </button>
+          </span>
+        </div>
+        {qualities.length > 1 ? (
+          <label style={UI.field}>
+            <span style={UI.label}>Quality</span>
+            <select
+              aria-label={`Quality for ${name}`}
+              value={target.qualityLevel}
+              style={UI.control}
+              onChange={(event) => handleTargetQualityChange(specification, target, Number(event.currentTarget.value))}
+            >
+              {qualities.map((quality, index) => (
+                <option key={quality.key} value={index}>
+                  {quality.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+      </div>
+
+      {readout.length === 0 ? null : (
+        <p style={{ ...UI.muted, margin: "10px 0 0" }}>
+          <span style={UI.number}>{readout.join(" · ")}</span>
+        </p>
+      )}
+
+      <button type="button" style={{ ...UI.primaryButton, width: "100%", marginTop: 14 }} onClick={onClose}>
+        Done
+      </button>
+    </ModalDialog>
+  )
+}
+
+function factoryRowIdentity(row: FactoryRow): string {
+  if (row.item !== null) return `item:${row.item.key}`
+  return row.recipe === null ? `row:${row.key}` : `recipe:${row.recipe.key}`
+}
+
+// The card (compact) or Edit row button (wide) that opened the row editor, for focus return.
+function factoryRowTriggerId(identity: string): string {
+  return `factory-row-trigger-${identity}`
+}
+
+function moduleCountText(
+  modules: readonly (Module | null | undefined)[],
+  qualities: readonly Quality[],
+  normalQuality: Quality,
+): string {
+  const counts = new Map<string, number>()
+  modules.forEach((module, index) => {
+    if (module === null || module === undefined) return
+    const quality = qualities[index] ?? normalQuality
+    const name = quality === normalQuality ? module.name : qualifiedEquipmentName(module, quality)
+    counts.set(name, (counts.get(name) ?? 0) + 1)
+  })
+  if (counts.size === 0) return "No modules"
+  return [...counts].map(([name, count]) => `${name} ×${count}`).join(", ")
+}
+
+function FactoryCardList({
+  specification,
+  rows,
+  onOpen,
+}: {
+  readonly specification: FactorySpecification
+  readonly rows: readonly FactoryRow[]
+  readonly onOpen: (row: FactoryRow) => void
+}) {
+  const normalQuality = specification.getNormalQuality()
+  return (
+    <ul aria-label="Factory rows" style={{ display: "grid", gap: 8, margin: 0, padding: 0, listStyle: "none" }}>
+      {rows.map((row) => {
+        const { item, recipe, rate, imported, belts, building, machineQuality, count, moduleSpec, target } = row
+        const name = item?.name ?? recipe?.name ?? ""
+        const icon = item?.icon ?? recipe?.icon
+        const showBeacons =
+          building !== null && moduleSpec !== null && building.canBeacon() && !moduleSpec.beaconCount.isZero()
+        return (
+          <li key={row.key}>
+            <button
+              type="button"
+              id={factoryRowTriggerId(factoryRowIdentity(row))}
+              className="factory-card"
+              data-row-identity={factoryRowIdentity(row)}
+              data-item-key={item?.key}
+              data-recipe-key={recipe?.key}
+              aria-label={`Edit ${name}`}
+              style={{
+                ...UI.factoryCard,
+                borderLeft: target ? "3px solid var(--accent)" : UI.factoryCard.border,
+                opacity: imported ? 0.6 : 1,
+              }}
+              onClick={() => onOpen(row)}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
+                {icon === undefined ? null : <SpriteIcon icon={icon} size={32} dimmed={imported} title={name} />}
+                <span style={{ display: "grid", flex: 1, minWidth: 0, gap: 1 }}>
+                  <span style={{ color: "var(--bright)", fontWeight: 600 }}>{name}</span>
+                  <span style={UI.muted}>
+                    {target ? <span style={{ color: "var(--accent)" }}>Target · </span> : null}
+                    {imported
+                      ? "Imported"
+                      : building === null
+                        ? ""
+                        : machineQuality === normalQuality
+                          ? building.name
+                          : qualifiedEquipmentName(building, machineQuality)}
+                  </span>
+                </span>
+                {item === null ? null : (
+                  <span style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    <span style={UI.number}>{specification.format.rate(rate)}</span>
+                    <span style={UI.muted}>/{specification.format.rateName}</span>
+                  </span>
+                )}
+              </span>
+              <span style={{ ...UI.row, gap: 4 }}>
+                {recipe === null || building === null ? null : (
+                  <span style={UI.cardChip}>
+                    {specification.format.count(count)} × {building.name}
+                  </span>
+                )}
+                {building === null || moduleSpec === null || building.moduleSlots === 0 ? null : (
+                  <span style={UI.cardChip}>
+                    {moduleCountText(moduleSpec.modules, moduleSpec.moduleQualities, normalQuality)}
+                  </span>
+                )}
+                {!showBeacons || moduleSpec === null ? null : (
+                  <span style={UI.cardChip}>
+                    {moduleSpec.beaconCount.toString()} beacon{moduleSpec.beaconCount.equal(one) ? "" : "s"}
+                  </span>
+                )}
+                {belts === null ? null : (
+                  <span style={UI.cardChip}>
+                    {specification.format.count(belts)} belt{belts.equal(one) ? "" : "s"}
+                  </span>
+                )}
+              </span>
+            </button>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function CompactModuleSlots({
+  specification,
+  recipe,
+  building,
+  moduleSpec,
+  beacon,
+}: {
+  readonly specification: FactorySpecification
+  readonly recipe: Recipe
+  readonly building: Building
+  readonly moduleSpec: ModuleSpec
+  readonly beacon: boolean
+}) {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const modules = beacon ? moduleSpec.beaconModules : moduleSpec.modules
+  const qualities = beacon ? moduleSpec.beaconModuleQualities : moduleSpec.moduleQualities
+  const normalQuality = specification.getNormalQuality()
+  const index = Math.min(selectedIndex, Math.max(0, modules.length - 1))
+  const selectedModule = modules[index] ?? null
+  const selectedQuality = qualities[index] ?? specification.defaultModuleQuality
+  const kind = beacon ? "Beacon module" : "Module"
+  const palette = moduleRows
+    .flat()
+    .filter(
+      (candidate) => candidate === null || (candidate.canUse(recipe, building) && (!beacon || candidate.canBeacon())),
+    )
+  const setModule = (slot: number, module: Module | null) => {
+    if (beacon) moduleSpec.setBeaconModule(module, slot)
+    else void moduleSpec.setModule(slot, module)
+  }
+  const setQuality = (slot: number, quality: Quality) => {
+    if (beacon) moduleSpec.setBeaconModuleQuality(quality, slot)
+    else void moduleSpec.setModuleQuality(slot, quality)
+  }
+  if (modules.length === 0) return null
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      <div style={{ ...UI.row, justifyContent: "space-between" }}>
+        <span style={UI.muted}>
+          {modules.length} {beacon ? "beacon slot" : "slot"}
+          {modules.length === 1 ? "" : "s"}
+        </span>
+        {modules.length > 1 ? (
+          <button
+            type="button"
+            aria-label={`Fill all ${kind.toLowerCase()} slots`}
+            style={UI.button}
+            onClick={() =>
+              runMutation(specification, () => {
+                for (let slot = 0; slot < modules.length; slot++) {
+                  setModule(slot, selectedModule)
+                  if ((qualities[slot] ?? specification.defaultModuleQuality) !== selectedQuality) {
+                    setQuality(slot, selectedQuality)
+                  }
+                }
+              })
+            }
+          >
+            Fill all
+          </button>
+        ) : null}
+      </div>
+      <div role="group" aria-label={`${kind} slots for ${recipe.name}`} style={{ ...UI.row, gap: 6 }}>
+        {modules.map((module, slot) => {
+          const quality = qualities[slot] ?? specification.defaultModuleQuality
+          const name =
+            module === null || module === undefined ? "Empty" : qualifiedModuleName({ module, quality }, normalQuality)
+          return (
+            <button
+              key={slot}
+              type="button"
+              aria-label={`${kind} slot ${slot + 1}: ${name}`}
+              aria-pressed={slot === index}
+              style={mergeStyles(UI.slotButton, slot === index && UI.slotButtonSelected)}
+              onClick={() => setSelectedIndex(slot)}
+            >
+              {module === null || module === undefined ? (
+                <EmptyModuleIcon />
+              ) : (
+                <SpriteIcon icon={module.icon} quality={quality} size={32} title={module.name} />
+              )}
+            </button>
+          )
+        })}
+      </div>
+      <div role="group" aria-label={`Choose ${kind.toLowerCase()} ${index + 1}`} style={{ ...UI.row, gap: 6 }}>
+        {palette.map((candidate) => {
+          const name = candidate === null ? "Empty module slot" : candidate.name
+          return (
+            <button
+              key={candidate?.key ?? "empty"}
+              type="button"
+              aria-label={name}
+              aria-pressed={candidate === selectedModule}
+              style={mergeStyles(UI.slotButton, candidate === selectedModule && UI.slotButtonSelected)}
+              onClick={() => runMutation(specification, () => setModule(index, candidate))}
+            >
+              {candidate === null ? <EmptyModuleIcon /> : <SpriteIcon icon={candidate.icon} size={32} title={name} />}
+            </button>
+          )
+        })}
+      </div>
+      {selectedModule === null ? null : (
+        <EquipmentQualityStrip
+          qualities={specification.getAvailableQualities()}
+          selected={selectedQuality}
+          label={`${kind} ${index + 1} quality for ${recipe.name}`}
+          onChoose={(quality) => runMutation(specification, () => setQuality(index, quality))}
+        />
+      )}
+    </div>
+  )
+}
+
+function FactoryRowEditorShell({
+  variant,
+  onClose,
+  children,
+}: {
+  readonly variant: "dialog" | "drawer"
+  readonly onClose: () => void
+  readonly children: ReactNode
+}) {
+  if (variant === "dialog") {
+    return (
+      <ModalDialog labelledBy="factory-row-editor-title" style={UI.fullScreenDialog} onClose={onClose}>
+        {children}
+      </ModalDialog>
+    )
+  }
+  return (
+    <aside
+      id="factory-row-editor"
+      aria-labelledby="factory-row-editor-title"
+      style={UI.rowDrawer}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && !isNestedPopoverEscape(event.target)) onClose()
+      }}
+    >
+      {children}
+    </aside>
+  )
+}
+
+// One row editor in two shells: a full-screen modal dialog on phones and a non-modal side drawer beside the
+// desktop factory table. Both call the same model methods as the inline table controls.
+export function FactoryRowEditor({
+  specification,
+  totals,
+  row,
+  onClose,
+  variant = "dialog",
+}: {
+  readonly specification: FactorySpecification
+  readonly totals: Totals
+  readonly row: FactoryRow
+  readonly onClose: () => void
+  readonly variant?: "dialog" | "drawer"
+}) {
+  const { item, recipe, rate, imported, belts, recipeRate, building, machineQuality, count, moduleSpec, power } = row
+  const name = item?.name ?? recipe?.name ?? ""
+  const icon = item?.icon ?? recipe?.icon
+
+  const machineQualities =
+    building !== null && building.supportsEquipmentQuality() ? specification.getAvailableQualities() : []
+  const override = recipe === null ? null : specification.getBuildingOverride(recipe)
+  const compatibleBuildings = recipe === null ? [] : specification.getCompatibleBuildings(recipe, false)
+  const automaticBuilding = recipe === null ? null : (specification.getAutomaticBuilding(recipe) ?? building)
+  const machineOptions: readonly { readonly building: Building | null; readonly display: Building }[] =
+    automaticBuilding === null || (compatibleBuildings.length <= 1 && override === null)
+      ? []
+      : [
+          { building: null, display: automaticBuilding },
+          ...compatibleBuildings.map((candidate) => ({ building: candidate, display: candidate })),
+        ]
+  const locations =
+    recipe === null || !recipe.isReal() || specification.selectedPlanets.size <= 1
+      ? []
+      : getRecipeLocations(specification, recipe, building)
+  const configuredLocation = recipe === null ? null : (specification.recipeLocations.get(recipe) ?? null)
+  const assignedLocation =
+    configuredLocation !== null && locations.includes(configuredLocation) ? configuredLocation : null
+  const automaticLocation = recipe === null ? null : getAssignedLocation(specification, recipe, building)
+  const craftsPerMachine = recipe === null ? null : specification.getRecipeRate(recipe)
+  const productivity = recipe === null ? null : specification.getProdEffect(recipe).sub(one)
+  const fuel =
+    recipe === null || power === null || power.fuel === "electric" ? null : specification.getFuelForRecipe(recipe)
+  const powerText =
+    power === null || power.fuel === null
+      ? null
+      : power.fuel === "electric"
+        ? formatPower(specification, power.power)
+        : fuel === null
+          ? null
+          : `${specification.format.rate(power.power.div(fuel.value))} ${fuel.name} / ${specification.format.rateName}`
+  const machineSummary = [
+    item === null ? null : `${specification.format.rate(rate)}/${specification.format.rateName}`,
+    recipe === null || building === null
+      ? null
+      : `${specification.format.count(count)} machine${count.equal(one) ? "" : "s"}`,
+    powerText,
+  ].filter((part) => part !== null)
+
+  return (
+    <FactoryRowEditorShell variant={variant} onClose={onClose}>
+      <header style={UI.dialogHeader}>
+        {variant === "dialog" ? (
+          <button type="button" aria-label="Back to factory" style={UI.iconButton} onClick={onClose}>
+            <UiGlyph name="right" size={18} rotate={180} />
+          </button>
+        ) : null}
+        {icon === undefined ? null : <SpriteIcon icon={icon} size={32} dimmed={imported} title={name} />}
+        <div style={{ display: "grid", flex: 1, minWidth: 0 }}>
+          <h2 id="factory-row-editor-title" style={{ ...UI.compactTitle, fontSize: 18 }}>
+            {name}
+          </h2>
+          <span style={UI.muted}>{machineSummary.join(" · ")}</span>
+        </div>
+        {variant === "drawer" ? (
+          <button type="button" aria-label="Close row editor" style={UI.iconButton} onClick={onClose}>
+            ×
+          </button>
+        ) : null}
+      </header>
+
+      {item === null || recipe === null ? null : (
+        <section aria-labelledby="row-editor-recipe" style={UI.editorSection}>
+          <h3 id="row-editor-recipe" style={UI.editorHeading}>
+            Recipe
+          </h3>
+          <div style={UI.row}>
+            <RecipeIconPicker specification={specification} item={item} activeRecipe={recipe} />
+            <span>{recipe.name}</span>
+          </div>
+        </section>
+      )}
+
+      {recipe === null || building === null ? null : (
+        <section aria-labelledby="row-editor-machine" style={UI.editorSection}>
+          <h3 id="row-editor-machine" style={UI.editorHeading}>
+            Machine
+          </h3>
+          {machineOptions.length === 0 ? (
+            <IconLabel icon={building.icon} name={building.name} quality={machineQuality} />
+          ) : (
+            <div role="group" aria-label={`Machine for ${recipe.name}`} style={{ display: "grid", gap: 6 }}>
+              {machineOptions.map((option) => {
+                const chosen = option.building === override
+                return (
+                  <button
+                    key={option.building?.key ?? "automatic"}
+                    type="button"
+                    aria-pressed={chosen}
+                    style={mergeStyles(UI.choiceButton, chosen && UI.choiceButtonSelected)}
+                    onClick={() =>
+                      runMutation(specification, () => specification.setBuildingOverride(recipe, option.building))
+                    }
+                  >
+                    <SpriteIcon icon={option.display.icon} size={32} title={option.display.name} />
+                    <span style={{ flex: 1 }}>
+                      {option.building === null ? `Automatic (${option.display.name})` : option.display.name}
+                    </span>
+                    {option.display.speed.isZero() ? null : (
+                      <span style={UI.number}>{formatCanadianNumber(option.display.speed.toDecimal())}×</span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          <EquipmentQualityStrip
+            qualities={machineQualities}
+            selected={machineQuality}
+            label={`Machine quality for ${recipe.name}`}
+            onChoose={(quality) => runMutation(specification, () => specification.setMachineQuality(recipe, quality))}
+          />
+        </section>
+      )}
+
+      {recipe === null || building === null || moduleSpec === null || building.moduleSlots === 0 ? null : (
+        <section aria-labelledby="row-editor-modules" style={UI.editorSection}>
+          <h3 id="row-editor-modules" style={UI.editorHeading}>
+            Modules
+          </h3>
+          <CompactModuleSlots
+            specification={specification}
+            recipe={recipe}
+            building={building}
+            moduleSpec={moduleSpec}
+            beacon={false}
+          />
+        </section>
+      )}
+
+      {recipe === null || building === null || moduleSpec === null || !building.canBeacon() ? null : (
+        <section aria-labelledby="row-editor-beacons" style={UI.editorSection}>
+          <h3 id="row-editor-beacons" style={UI.editorHeading}>
+            Beacons
+          </h3>
+          <div style={{ ...UI.row, justifyContent: "space-between" }}>
+            <span>Count per machine</span>
+            <span style={{ ...UI.row, gap: 4, flexWrap: "nowrap" }}>
+              <button
+                type="button"
+                aria-label="Fewer beacons"
+                style={UI.iconButton}
+                disabled={moduleSpec.beaconCount.isZero()}
+                onClick={() =>
+                  runMutation(specification, () =>
+                    moduleSpec.setBeaconCount(Rational.max(zero, moduleSpec.beaconCount.sub(one))),
+                  )
+                }
+              >
+                −
+              </button>
+              <CommitInput
+                key={`${recipe.key}-${moduleSpec.beaconCount.toString()}`}
+                ariaLabel={`Beacon count for ${recipe.name}`}
+                value={moduleSpec.beaconCount.toString()}
+                style={{ width: 64, textAlign: "center" }}
+                onCommit={(value) =>
+                  runMutation(specification, () => moduleSpec.setBeaconCount(Rational.from_string(value)))
+                }
+              />
+              <button
+                type="button"
+                aria-label="More beacons"
+                style={UI.iconButton}
+                onClick={() =>
+                  runMutation(specification, () => moduleSpec.setBeaconCount(moduleSpec.beaconCount.add(one)))
+                }
+              >
+                +
+              </button>
+            </span>
+          </div>
+          <CompactModuleSlots
+            specification={specification}
+            recipe={recipe}
+            building={building}
+            moduleSpec={moduleSpec}
+            beacon
+          />
+          {moduleSpec.beaconModules.some((module) => module !== null) ? (
+            <EquipmentQualityStrip
+              qualities={specification.getAvailableQualities()}
+              selected={moduleSpec.beaconQuality}
+              label={`Beacon quality for ${recipe.name}`}
+              onChoose={(quality) => runMutation(specification, () => moduleSpec.setBeaconQuality(quality))}
+            />
+          ) : null}
+        </section>
+      )}
+
+      {recipe === null || locations.length === 0 ? null : (
+        <section aria-labelledby="row-editor-location" style={UI.editorSection}>
+          <h3 id="row-editor-location" style={UI.editorHeading}>
+            Location
+          </h3>
+          <div role="group" aria-label={`Production location for ${recipe.name}`} style={{ ...UI.row, gap: 6 }}>
+            {[null, ...locations].map((location) => {
+              const chosen = location === assignedLocation
+              return (
+                <button
+                  key={location?.key ?? "automatic"}
+                  type="button"
+                  aria-pressed={chosen}
+                  style={mergeStyles(UI.button, chosen && UI.choiceButtonSelected)}
+                  onClick={() => runMutation(specification, () => specification.setRecipeLocation(recipe, location))}
+                >
+                  {location === null ? `Automatic (${automaticLocation?.name ?? "unavailable"})` : location.name}
+                </button>
+              )
+            })}
+          </div>
+        </section>
+      )}
+
+      {item === null || belts === null ? null : (
+        <section aria-labelledby="row-editor-belts" style={UI.editorSection}>
+          <h3 id="row-editor-belts" style={UI.editorHeading}>
+            Belts
+          </h3>
+          <div style={{ ...UI.row, justifyContent: "space-between" }}>
+            <span style={UI.number}>
+              {specification.format.count(belts)} belt{belts.equal(one) ? "" : "s"} · ×
+              {specification.getEffectiveBeltStackSize(item, recipe).toDecimal()} stack
+            </span>
+            <select
+              aria-label={`Belt stacking for ${item.name}`}
+              value={
+                specification.getBeltStackPolicySource(item) === "default" ? "" : specification.getBeltStackPolicy(item)
+              }
+              style={{ ...UI.control, width: "auto" }}
+              onChange={(event) => {
+                const value = event.currentTarget.value
+                runMutation(specification, () =>
+                  specification.setBeltStackOverride(item, value === "" ? null : (value as BeltStackPolicy)),
+                )
+              }}
+            >
+              <option value="">Default</option>
+              <option value="auto">Auto</option>
+              <option value="stacked">Stacked</option>
+              <option value="unstacked">Unstacked</option>
+            </select>
+          </div>
+        </section>
+      )}
+
+      {recipe === null || building === null ? null : (
+        <section aria-label="Row statistics" style={UI.editorSection}>
+          <dl style={UI.statList}>
+            {craftsPerMachine === null ? null : (
+              <div style={UI.statRow}>
+                <dt style={UI.muted}>Crafts per machine</dt>
+                <dd style={UI.statValue}>
+                  {specification.format.rate(craftsPerMachine)}/{specification.format.rateName}
+                </dd>
+              </div>
+            )}
+            {productivity === null || productivity.isZero() ? null : (
+              <div style={UI.statRow}>
+                <dt style={UI.muted}>Productivity</dt>
+                <dd style={UI.statValue}>+{formatPercent(productivity)}</dd>
+              </div>
+            )}
+            <div style={UI.statRow}>
+              <dt style={UI.muted}>Recipe rate</dt>
+              <dd style={UI.statValue}>
+                {specification.format.rate(recipeRate)}/{specification.format.rateName}
+              </dd>
+            </div>
+            {power === null || power.fuel !== "electric" || count.isZero() ? null : (
+              <div style={UI.statRow}>
+                <dt style={UI.muted}>Power per machine</dt>
+                <dd style={UI.statValue}>{formatPower(specification, power.power.div(count))}</dd>
+              </div>
+            )}
+          </dl>
+        </section>
+      )}
+
+      {item === null ? null : (
+        <section aria-labelledby="row-editor-breakdown" style={UI.editorSection}>
+          <h3 id="row-editor-breakdown" style={UI.editorHeading}>
+            Breakdown
+          </h3>
+          <ItemBreakdown specification={specification} item={item} totals={totals} />
+        </section>
+      )}
+
+      {item === null ? null : (
+        <div style={{ display: "grid", gap: 8, padding: "12px 0 calc(12px + env(safe-area-inset-bottom))" }}>
+          <button
+            type="button"
+            style={UI.button}
+            onClick={() => runMutation(specification, () => specification.toggleIgnore(item))}
+          >
+            {imported ? "Produce this item in the factory" : "Ignore this item (treat as imported)"}
+          </button>
+          <a
+            href={`#${formatSettings(false, null, [[item, rate]], specification)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ ...UI.button, textAlign: "center", textDecoration: "none" }}
+          >
+            Open {item.name} as a new plan
+          </a>
+        </div>
+      )}
+    </FactoryRowEditorShell>
+  )
+}
+
+function FactoryPanel({
+  snapshot,
+  compact = false,
+  onOpenTargets,
+}: {
+  readonly snapshot: CalculatorSnapshot
+  readonly compact?: boolean
+  readonly onOpenTargets?: (() => void) | undefined
+}) {
+  const [editingRow, setEditingRow] = useState<string | null>(null)
   const [pipetteSelection, setPipetteSelection] = useState<ModulePipetteSelection | null>(null)
   const [hoveredPipetteSource, setHoveredPipetteSource] = useState<ModulePipetteSelection | null | undefined>(undefined)
   const [pipetteMessage, setPipetteMessage] = useState("")
@@ -15465,6 +16778,7 @@ function FactoryPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
     setPipetteSelection(null)
     setHoveredPipetteSource(undefined)
     setPipetteMessage("")
+    setEditingRow(null)
   }, [snapshot.specification])
 
   useEffect(() => {
@@ -15511,6 +16825,17 @@ function FactoryPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
       </div>
     )
   }
+  const rows = getFactoryRows(snapshot.specification, snapshot.totals)
+  const editing = editingRow === null ? null : (rows.find((row) => factoryRowIdentity(row) === editingRow) ?? null)
+  const openRowEditor = (row: FactoryRow) => {
+    const identity = factoryRowIdentity(row)
+    setEditingRow((current) => (current === identity && !compact ? null : identity))
+  }
+  const closeRowEditor = () => {
+    const identity = editingRow
+    setEditingRow(null)
+    if (identity !== null) requestAnimationFrame(() => document.getElementById(factoryRowTriggerId(identity))?.focus())
+  }
   return (
     <div
       id="totals_tab"
@@ -15555,8 +16880,40 @@ function FactoryPanel({ snapshot }: { readonly snapshot: CalculatorSnapshot }) {
           />
         </div>
       )}
-      <FactorySummaryView specification={snapshot.specification} totals={snapshot.totals} />
-      <ItemTable specification={snapshot.specification} totals={snapshot.totals} pipette={pipette} />
+      <FactorySummaryView specification={snapshot.specification} totals={snapshot.totals} compact={compact} />
+      {onOpenTargets === undefined ? null : <CompactTargetLine snapshot={snapshot} onOpenTargets={onOpenTargets} />}
+      {compact ? (
+        <FactoryCardList specification={snapshot.specification} rows={rows} onOpen={openRowEditor} />
+      ) : (
+        <div style={editing === null ? undefined : UI.drawerLayout}>
+          <ItemTable
+            specification={snapshot.specification}
+            totals={snapshot.totals}
+            rows={rows}
+            pipette={pipette}
+            editingRow={editingRow}
+            onEdit={openRowEditor}
+          />
+          {editing === null ? null : (
+            <FactoryRowEditor
+              key={editingRow}
+              specification={snapshot.specification}
+              totals={snapshot.totals}
+              row={editing}
+              variant="drawer"
+              onClose={closeRowEditor}
+            />
+          )}
+        </div>
+      )}
+      {compact && editing !== null ? (
+        <FactoryRowEditor
+          specification={snapshot.specification}
+          totals={snapshot.totals}
+          row={editing}
+          onClose={closeRowEditor}
+        />
+      ) : null}
       <PlanningDetails specification={snapshot.specification} totals={snapshot.totals} />
     </div>
   )
@@ -17078,10 +18435,17 @@ function HelpPanel() {
           firstColumn="Action"
           secondColumn="Control"
           rows={[
-            ["Combine production locations", "Shift-click location buttons"],
-            ["Treat an ingredient as externally supplied", "Click its icon in the Factory table"],
-            ["Restore an imported ingredient to the production chain", "Click the icon again"],
-            ["Change a recipe for one item", "Use the recipe selector in its Factory row"],
+            ["Combine production locations", "Shift-click location buttons; on a phone, tap them in Targets"],
+            [
+              "Treat an ingredient as externally supplied",
+              "Click its icon in the Factory table; on a phone, open its card and choose Ignore",
+            ],
+            ["Restore an imported ingredient to the production chain", "Click the icon again, or use the card"],
+            ["Change a recipe for one item", "Use the recipe selector in its Factory row or card"],
+            [
+              "Edit every setting for one row in one place",
+              "Click the sliders button at the end of its Factory row; on a phone, tap its card",
+            ],
             [
               "Copy a module and its quality between slots",
               "Hover a module or module choice and press Q; press Q again or Esc to put it away",
@@ -17326,19 +18690,71 @@ function ChangelogEntry({
   )
 }
 
-export function CalculatorView({ snapshot, commands }: CalculatorViewProps) {
+export function CalculatorView({ snapshot, commands, compact }: CalculatorViewProps & { readonly compact?: boolean }) {
+  const compactLayout = useCompactLayout()
+  const isCompact = compact ?? compactLayout
+  const [targetsOpen, setTargetsOpen] = useState(false)
+  const activeTabLabel = CALCULATOR_TABS.find(([tab]) => tab === snapshot.activeTab)?.[1] ?? "Factory"
   return (
     <Fragment>
       <style>{BASE_CSS}</style>
       <div
         className="calculator-app"
         data-density={snapshot.factoryDensity}
+        data-layout={isCompact ? "compact" : "wide"}
         style={mergeStyles(UI.app, THEME_VARIABLES)}
       >
-        <div style={UI.page}>
-          <TargetsPanel snapshot={snapshot} commands={commands} />
-          <TabBar snapshot={snapshot} commands={commands} />
-          {snapshot.activeTab === "totals" ? <FactoryPanel snapshot={snapshot} /> : null}
+        <div style={mergeStyles(UI.page, isCompact && { paddingBottom: "calc(64px + env(safe-area-inset-bottom))" })}>
+          {isCompact ? (
+            <header style={UI.compactHeader}>
+              {/* Help renders its own page heading. */}
+              {snapshot.activeTab === "help" ? (
+                <span style={{ flex: 1 }} />
+              ) : (
+                <h1 style={UI.compactTitle}>{activeTabLabel}</h1>
+              )}
+              <span role="status" aria-live="polite" style={UI.muted}>
+                {snapshot.shareStatus}
+              </span>
+              <button type="button" style={UI.button} onClick={() => setTargetsOpen(true)}>
+                Targets ({snapshot.specification.buildTargets.length})
+              </button>
+              <button
+                type="button"
+                aria-label="Copy plan link"
+                title="Copy plan link"
+                style={UI.iconButton}
+                onClick={() => void commands.copyShareLink()}
+              >
+                <svg
+                  aria-hidden="true"
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5" />
+                </svg>
+              </button>
+            </header>
+          ) : (
+            <TargetsPanel snapshot={snapshot} commands={commands} />
+          )}
+          {isCompact && targetsOpen ? (
+            <TargetsScreen snapshot={snapshot} commands={commands} onClose={() => setTargetsOpen(false)} />
+          ) : null}
+          <TabBar snapshot={snapshot} commands={commands} compact={isCompact} />
+          {snapshot.activeTab === "totals" ? (
+            <FactoryPanel
+              snapshot={snapshot}
+              compact={isCompact}
+              onOpenTargets={isCompact ? () => setTargetsOpen(true) : undefined}
+            />
+          ) : null}
           {snapshot.activeTab === "graph" ? <GraphPanel snapshot={snapshot} /> : null}
           {snapshot.activeTab === "resources" ? <PriorityPanel snapshot={snapshot} /> : null}
           {snapshot.activeTab === "settings" ? <SettingsPanel snapshot={snapshot} commands={commands} /> : null}
@@ -17352,6 +18768,26 @@ export function CalculatorView({ snapshot, commands }: CalculatorViewProps) {
       </div>
     </Fragment>
   )
+}
+
+// Below this width the calculator renders cards and full-screen editors instead of the factory table.
+const COMPACT_LAYOUT_QUERY = "(max-width: 760px)"
+
+function subscribeCompactLayout(onChange: () => void) {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {}
+  const query = window.matchMedia(COMPACT_LAYOUT_QUERY)
+  query.addEventListener("change", onChange)
+  return () => query.removeEventListener("change", onChange)
+}
+
+function getCompactLayout() {
+  return typeof window !== "undefined" && typeof window.matchMedia === "function"
+    ? window.matchMedia(COMPACT_LAYOUT_QUERY).matches
+    : false
+}
+
+function useCompactLayout() {
+  return useSyncExternalStore(subscribeCompactLayout, getCompactLayout, () => false)
 }
 
 export function useCalculatorStore() {
